@@ -748,7 +748,7 @@ export default function Face() {
                     <div className="flex items-center gap-4">
                         <div className="relative flex-none">
                             <img
-                                src="/ppic.png"
+                                src="/ppic.PNG"
                                 alt="Unique"
                                 width={96}
                                 height={96}
