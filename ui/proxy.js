@@ -1,47 +1,23 @@
-import { NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 
+// Guards the admin page with the same auth_token cookie the API routes check
 export async function proxy(request) {
-    let response = NextResponse.next({
-        request: {
-            headers: request.headers,
-        },
-    });
+    const secret = process.env.JWT_SECRET;
+    const token = request.cookies.get("auth_token")?.value;
 
-    // 1. Initialize Supabase client for middleware
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-        {
-            cookies: {
-                getAll() {
-                    return request.cookies.getAll();
-                },
-                setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value));
-                    response = NextResponse.next({
-                        request,
-                    });
-                    cookiesToSet.forEach(({ name, value, options }) =>
-                        response.cookies.set(name, value, options)
-                    );
-                },
-            },
+    if (secret && token) {
+        try {
+            await jwtVerify(token, new TextEncoder().encode(secret), { algorithms: ["HS256"] });
+            return NextResponse.next();
+        } catch {
+            // bad or expired token: fall through to the redirect
         }
-    );
-
-    // 2. Check if user is logged in
-    const { data: { user } } = await supabase.auth.getUser();
-
-    // 3. Protect the /admin route (redirect to login if not logged in)
-    if (request.nextUrl.pathname.startsWith('/admin') && !user) {
-        return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    return response;
+    return NextResponse.redirect(new URL("/login", request.url));
 }
 
-// 4. Specify which routes this middleware should run on
 export const config = {
-    matcher: ['/uoadminuo/:path*', '/api/protected/:path*'],
+    matcher: ["/uoadminuo/:path*"],
 };
