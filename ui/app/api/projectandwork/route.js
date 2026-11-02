@@ -1,10 +1,11 @@
+
+export const dynamic = "force-dynamic";
 import supabaseAdmin from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
 
-export const dynamic = "force-dynamic";
 
 // textarea (one per line) -> array for jsonb columns
 const toList = (v) =>
@@ -112,28 +113,7 @@ export async function POST(req) {
     }
 }
 
-export async function GET(req) {
-    try {
-        const { data: fetchAll, error } = await supabaseAdmin
-            .from("experience")
-            .select("*")
-            .order("id", { ascending: false });
 
-        if (error) {
-            return NextResponse.json(
-                { message: "Failed to fetch records", error: error.message },
-                { status: 500 }
-            );
-        }
-
-        return NextResponse.json({ fetchAll: fetchAll || [] }, { status: 200 });
-    } catch (err) {
-        return NextResponse.json(
-            { message: "Internal server error", error: err.message },
-            { status: 500 }
-        );
-    }
-}
 export async function GET(req) {
     try {
         const { data: fetchAll, error } = await supabaseAdmin

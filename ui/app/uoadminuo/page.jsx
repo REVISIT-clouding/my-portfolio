@@ -145,7 +145,7 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
             </select>
 
             <input type="text" placeholder="Status of project" value={status} onChange={(e) => setStatus(e.target.value)} />
-            <input type="text" placeholder="Link" value={href} onChange={(e) => setHref(e.target.value)} required />
+            <input type="text" placeholder="Link" value={href} onChange={(e) => setHref(e.target.value)} />
 
             <div className="flex gap-2">
                 <button type="submit" disabled={loading} className="flex-1 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
