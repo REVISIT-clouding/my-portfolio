@@ -8,6 +8,12 @@ import { SiSkillshare } from "react-icons/si";
 const stackOf = (s) =>
     (Array.isArray(s) ? s : String(s || "").split(",")).map((t) => t.trim()).filter(Boolean);
 
+// jsonb array (or newline string) -> one item per line for the textarea
+const listOf = (v) =>
+    (Array.isArray(v) ? v : String(v || "").split("\n"))
+        .map((x) => (typeof x === "string" ? x.trim() : String(x?.title ?? x?.text ?? "")))
+        .filter(Boolean);
+
 // Used for both creating (no `existing`) and editing (pass the item as `existing`)
 export function CreateEXP({ onSuccess, existing, onCancel }) {
     const editing = !!existing;
@@ -16,6 +22,12 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
     const [subtitle, setSubtitle] = useState(existing?.subtitle ?? "");
     const [summary, setSummary] = useState(existing?.summary ?? "");
     const [details, setDetails] = useState(existing?.details ?? "");
+    const [overview, setOverview] = useState(existing?.overview ?? "");
+    const [contributions, setContributions] = useState(listOf(existing?.contributions).join("\n"));
+    const [keyFeatures, setKeyFeatures] = useState(listOf(existing?.key_features).join("\n"));
+    const [techImpl, setTechImpl] = useState(existing?.technical_implementation ?? "");
+    const [challenges, setChallenges] = useState(listOf(existing?.engineering_challenges).join("\n"));
+    const [limitations, setLimitations] = useState(listOf(existing?.known_limitations).join("\n"));
     const [mode, setMode] = useState(existing?.mode ?? "project");
     const [stack, setStack] = useState(stackOf(existing?.stack).join(", "));
     const [footerleft, setFooterleft] = useState(existing?.footerLeft ?? existing?.footerleft ?? "");
@@ -31,27 +43,30 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
         setError("");
 
         let formattedHref = href.trim();
-    if (formattedHref && !/^https?:\/\//i.test(formattedHref)) {
-        formattedHref = `https://${formattedHref}`;
-    }
-
-    const fd = new FormData();
-    fd.append("href", formattedHref);
+        if (formattedHref && !/^https?:\/\//i.test(formattedHref)) {
+            formattedHref = `https://${formattedHref}`;
+        }
 
         try {
             let res;
-       
+
             const fd = new FormData();
             fd.append("title", title);
             fd.append("subtitle", subtitle);
             fd.append("summary", summary);
             fd.append("details", details);
+            fd.append("overview", overview);
+            fd.append("contributions", contributions);
+            fd.append("key_features", keyFeatures);
+            fd.append("technical_implementation", techImpl);
+            fd.append("engineering_challenges", challenges);
+            fd.append("known_limitations", limitations);
             fd.append("stack", stack);
             fd.append("status", status);
             fd.append("mode", mode);
             fd.append("footerleft", footerleft);
-            fd.append("href", href);
-            
+            fd.append("href", formattedHref);
+
             if (imgFile) {
                 fd.append("img", imgFile);
             } else if (editing && existing?.img) {
@@ -61,12 +76,12 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
             if (editing) {
                 res = await fetch(`/api/projectandwork/${existing.id}`, {
                     method: "PUT",
-                    body: fd, 
+                    body: fd,
                 });
             } else {
-                res = await fetch("/api/projectandwork", { 
-                    method: "POST", 
-                    body: fd 
+                res = await fetch("/api/projectandwork", {
+                    method: "POST",
+                    body: fd,
                 });
             }
 
@@ -92,7 +107,14 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
             <input type="text" placeholder="Subtitle" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} required />
 
             <textarea placeholder="Summary" value={summary} onChange={(e) => setSummary(e.target.value)} required />
-            <textarea placeholder="Details" value={details} onChange={(e) => setDetails(e.target.value)} required />
+            <textarea placeholder="Details" value={details} onChange={(e) => setDetails(e.target.value)} />
+            <textarea placeholder="Overview" rows={4} value={overview} onChange={(e) => setOverview(e.target.value)} />
+            <textarea placeholder="My contribution (one per line)" rows={4} value={contributions} onChange={(e) => setContributions(e.target.value)} />
+            <textarea placeholder="Key features (one per line)" rows={4} value={keyFeatures} onChange={(e) => setKeyFeatures(e.target.value)} />
+            <textarea placeholder="Technical implementation" rows={5} value={techImpl} onChange={(e) => setTechImpl(e.target.value)} />
+            <textarea placeholder="Engineering challenges (one per line)" rows={4} value={challenges} onChange={(e) => setChallenges(e.target.value)} />
+            <textarea placeholder="Known limitations (one per line)" rows={4} value={limitations} onChange={(e) => setLimitations(e.target.value)} />
+
             <input type="text" placeholder="Stack (comma separated)" value={stack} onChange={(e) => setStack(e.target.value)} required />
             <input type="text" placeholder="E.g Full stack Development" value={footerleft} onChange={(e) => setFooterleft(e.target.value)} />
 
@@ -101,7 +123,7 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
                 <label className="text-xs text-gray-500 font-semibold">
                     {editing ? "Change Image (Optional)" : "Upload Image File"}
                 </label>
-                
+
                 {editing && existing?.img && (
                     <div className="flex items-center gap-2 mb-1">
                         <img src={existing.img} alt="Current" className="h-10 w-16 object-cover rounded border" />

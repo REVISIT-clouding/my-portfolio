@@ -43,5 +43,5 @@ export async function proxy(request) {
 
 // 4. Specify which routes this middleware should run on
 export const config = {
-    matcher: ['/admin/:path*', '/api/protected/:path*'],
+    matcher: ['/uoadminuo/:path*', '/api/protected/:path*'],
 };

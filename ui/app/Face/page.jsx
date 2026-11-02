@@ -18,7 +18,7 @@ const contacts = [
 ];
 
 /* ---------- edit your own details here ---------- */
-const PHONE = "+2349060214104"; 
+const PHONE = "+2349060214104";
 const WHATSAPP = "2349060214104";      // country code + number, no + or spaces
 const EMAIL = "uounique251@gmail.com";
 const STATUS = "Available for new projects";
@@ -38,12 +38,12 @@ export const ABOUT_FULL = [
 const TESTIMONIALS = [
     { quote: "I Like Your Vision and Drive.", name: "Dr Iyamu", role: "CEO & member of NEC Nigeria, Enoma Medical Center" },
     { quote: "WoW! WoW!! WoW!!! That's my Beloved son, Uchechukwu in action. Replace this with a real quote from a client, employer or teammate.I'm Very proud of you dear. You have done so well. May my good God so bless and lift you so high in Jesus Name, amen.", name: "Mr David Uworgiren", role: "Rev Pastor & District Men's Coordinator, Edo East." },
-    { quote: "He makes everything looks easy. He's my enginneer.", name: "Mr Emeka",},
+    { quote: "He makes everything looks easy. He's my enginneer.", name: "Mr Emeka", },
 ];
 
 const NAV = [
     ["about", "About"],
-    ["projects", "Experience"],
+    ["projects", "Projects"],
     ["skills", "Skills"],
     ["testimonials", "Testimonials"],
     ["contact", "Contact"],
@@ -58,11 +58,19 @@ const stackOf = (s) =>
 // "Next.js", "nextjs" and "Next JS" all match each other
 const norm = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9+#]/g, "");
 
+// only these statuses get a badge on the project cards
+const isLive = (s) => /live|pilot|deployed|shipped|production|completed/i.test(String(s || ""));
+
 const skillName = (s) =>
     s?.name ?? s?.skill ?? s?.title ?? s?.label ??
     Object.values(s || {}).find(
         (v) => typeof v === "string" && v.length < 40 && !/^[0-9a-f-]{36}$/i.test(v) && !/^\d{4}-\d{2}-\d{2}/.test(v)
     ) ?? "";
+
+/* keeps content a readable width on laptops, full width on phones */
+function Wrap({ className = "", children }) {
+    return <div className={`mx-auto w-full max-w-5xl ${className}`}>{children}</div>;
+}
 
 /* Close on Escape and stop the page behind from scrolling */
 function useModalBehavior(onClose) {
@@ -185,20 +193,22 @@ function Header() {
     return (
         <>
             <header
-                className="sticky top-0 z-30 flex items-center justify-between bg-white/90 px-5 pb-3 backdrop-blur"
+                className="sticky top-0 z-30 bg-white/90 px-5 pb-3 backdrop-blur"
                 style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
             >
-                <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-xl font-extrabold tracking-tight">
-                    Unique<span className="text-red-500">.</span>
-                </button>
-                <button
-                    onClick={() => setOpen(true)}
-                    aria-label="Open menu"
-                    aria-expanded={open}
-                    className="grid h-11 w-11 place-items-center rounded-full border text-2xl hover:bg-gray-100"
-                >
-                    <BiMenu />
-                </button>
+                <Wrap className="flex items-center justify-between">
+                    <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-xl font-extrabold tracking-tight">
+                        Unique<span className="text-red-500">.</span>
+                    </button>
+                    <button
+                        onClick={() => setOpen(true)}
+                        aria-label="Open menu"
+                        aria-expanded={open}
+                        className="grid h-12 w-12 place-items-center rounded-full border text-2xl hover:bg-gray-100"
+                    >
+                        <BiMenu />
+                    </button>
+                </Wrap>
                 <span
                     aria-hidden="true"
                     className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-red-500"
@@ -211,41 +221,43 @@ function Header() {
                     role="dialog"
                     aria-modal="true"
                     aria-label="Menu"
-                    className="fixed inset-0 z-[55] flex flex-col overflow-y-auto bg-black px-6 pb-8 text-white"
+                    className="fixed inset-0 z-[55] overflow-y-auto bg-black px-6 pb-8 text-white"
                     style={{ paddingTop: "max(1.25rem, env(safe-area-inset-top))" }}
                 >
-                    <div className="flex items-center justify-between">
-                        <span className="text-xl font-extrabold tracking-tight">
-                            Unique<span className="text-red-500">.</span>
-                        </span>
-                        <button
-                            onClick={() => setOpen(false)}
-                            aria-label="Close menu"
-                            className="grid h-11 w-11 place-items-center rounded-full border border-white/20 text-2xl hover:bg-white/10"
-                        >
-                            <BiX />
-                        </button>
-                    </div>
-
-                    <nav className="mt-8 flex flex-1 flex-col">
-                        {NAV.map(([id, label], i) => (
+                    <Wrap className="flex min-h-full flex-col">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xl font-extrabold tracking-tight">
+                                Unique<span className="text-red-500">.</span>
+                            </span>
                             <button
-                                key={id}
-                                onClick={() => go(id)}
-                                className="flex items-baseline gap-4 border-b border-white/10 py-4 text-left text-4xl font-extrabold tracking-tight transition hover:text-red-500"
+                                onClick={() => setOpen(false)}
+                                aria-label="Close menu"
+                                className="grid h-12 w-12 place-items-center rounded-full border border-white/20 text-2xl hover:bg-white/10"
                             >
-                                <span className="text-sm font-normal text-gray-500">{String(i + 1).padStart(2, "0")}</span>
-                                {label}
+                                <BiX />
                             </button>
-                        ))}
-                    </nav>
+                        </div>
 
-                    <button
-                        onClick={() => go("contact")}
-                        className="mt-6 inline-flex items-center justify-center gap-1 rounded-full bg-red-500 py-3.5 font-semibold hover:bg-red-600"
-                    >
-                        Let's talk <RiArrowRightUpLine className="text-xl" />
-                    </button>
+                        <nav className="mt-8 flex flex-1 flex-col">
+                            {NAV.map(([id, label], i) => (
+                                <button
+                                    key={id}
+                                    onClick={() => go(id)}
+                                    className="flex items-baseline gap-4 border-b border-white/10 py-4 text-left text-4xl font-extrabold tracking-tight transition hover:text-red-500"
+                                >
+                                    <span className="text-sm font-normal text-gray-500">{String(i + 1).padStart(2, "0")}</span>
+                                    {label}
+                                </button>
+                            ))}
+                        </nav>
+
+                        <button
+                            onClick={() => go("contact")}
+                            className="mt-6 inline-flex items-center justify-center gap-1 rounded-full bg-red-500 py-3.5 font-semibold hover:bg-red-600"
+                        >
+                            Let's talk <RiArrowRightUpLine className="text-xl" />
+                        </button>
+                    </Wrap>
                 </div>
             )}
         </>
@@ -253,8 +265,39 @@ function Header() {
 }
 
 /* ---------- project details modal ---------- */
+// accepts a jsonb array, or a newline-separated string
+const listOf = (v) =>
+    (Array.isArray(v) ? v : String(v || "").split("\n"))
+        .map((x) => (typeof x === "string" ? x.trim() : String(x?.title ?? x?.text ?? "")))
+        .filter(Boolean);
+
+function ModalSection({ title, children }) {
+    return (
+        <>
+            <h4 className="pt-4 text-lg font-bold">{title}</h4>
+            <div className="mt-1">{children}</div>
+        </>
+    );
+}
+
+function BulletList({ items }) {
+    return (
+        <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed text-gray-600">
+            {items.map((t, i) => <li key={i}>{t}</li>)}
+        </ul>
+    );
+}
+
+/* ---------- project details modal ---------- */
 function ProjectModal({ item, onClose }) {
     useModalBehavior(onClose);
+
+    const contributions = listOf(item.contributions);
+    const features = listOf(item.key_features);
+    const challenges = listOf(item.engineering_challenges);
+    const limitations = listOf(item.known_limitations);
+    const tech = stackOf(item.stack);
+    const overview = item.overview || item.details; // falls back to old field
 
     return (
         <div
@@ -271,13 +314,13 @@ function ProjectModal({ item, onClose }) {
                 <button
                     onClick={onClose}
                     aria-label="Close"
-                    className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-gray-100 text-xl hover:bg-gray-200"
+                    className="absolute right-3 top-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-gray-100 text-xl hover:bg-gray-200"
                 >
                     <BiX />
                 </button>
 
                 {item.img && (
-                    <img src={item.img} alt={item.title} className="mb-4 h-48 w-full rounded-2xl border object-cover" />
+                    <img src={item.img} alt={item.title} decoding="async" className="mb-4 h-40 w-full rounded-2xl border object-cover" />
                 )}
 
                 <div className="flex gap-2 text-xs">
@@ -285,26 +328,50 @@ function ProjectModal({ item, onClose }) {
                     <span className="rounded bg-blue-100 px-2 py-0.5 text-blue-700">{item.status}</span>
                 </div>
 
-                <h2 id="project-title" className="mt-3 text-2xl font-bold">{item.title}</h2>
-                <h3 className="text-md font-semibold text-gray-800">{item.subtitle}</h3>
+                <h2 id="project-title" className="mt-3 text-xl font-bold">{item.title}</h2>
+                <h3 className="text-sm font-semibold text-gray-800">{item.subtitle}</h3>
                 <p className="mt-2 text-sm text-gray-600">{item.summary}</p>
 
-                <h1 className="py-1 pt-4 text-xl font-bold">Details</h1>
-                <p className="text-sm leading-relaxed text-gray-600">{item.details}</p>
+                {overview && (
+                    <ModalSection title="Overview">
+                        <p className="text-sm leading-relaxed text-gray-600">{overview}</p>
+                    </ModalSection>
+                )}
 
-                {stackOf(item.stack).length > 0 && (
-                    <>
-                        <h1 className="py-1 pt-4 text-xl font-bold">Stack</h1>
+                {contributions.length > 0 && (
+                    <ModalSection title="My contribution"><BulletList items={contributions} /></ModalSection>
+                )}
+
+                {features.length > 0 && (
+                    <ModalSection title="Key features"><BulletList items={features} /></ModalSection>
+                )}
+
+                {item.technical_implementation && (
+                    <ModalSection title="Technical implementation">
+                        <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">{item.technical_implementation}</p>
+                    </ModalSection>
+                )}
+
+                {challenges.length > 0 && (
+                    <ModalSection title="Engineering challenges"><BulletList items={challenges} /></ModalSection>
+                )}
+
+                {limitations.length > 0 && (
+                    <ModalSection title="Known limitations"><BulletList items={limitations} /></ModalSection>
+                )}
+
+                {tech.length > 0 && (
+                    <ModalSection title="Technology stack">
                         <div className="flex flex-wrap gap-1.5">
-                            {stackOf(item.stack).map((t) => (
+                            {tech.map((t) => (
                                 <span key={t} className="rounded-full border px-2.5 py-0.5 text-xs">{t}</span>
                             ))}
                         </div>
-                    </>
+                    </ModalSection>
                 )}
 
                 <div className="mt-5 flex items-center justify-between gap-3">
-                    <span className="text-sm text-gray-600">{item.footerLeft}</span>
+                    <span className="text-sm text-gray-600">{item.footerleft}</span>
                     {item.href && (
                         <a
                             href={item.href}
@@ -320,6 +387,65 @@ function ProjectModal({ item, onClose }) {
         </div>
     );
 }
+
+
+
+/* ---------- "about my code" modal ---------- */
+function CodeModal({ onClose }) {
+    useModalBehavior(onClose);
+
+    const toProjects = () => {
+        onClose();
+        setTimeout(() => goTo("projects"), 80);
+    };
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center sm:p-4"
+            onClick={onClose}
+        >
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="code-title"
+                className="relative w-full max-w-lg rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button
+                    onClick={onClose}
+                    aria-label="Close"
+                    className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full bg-gray-100 text-xl hover:bg-gray-200"
+                >
+                    <BiX />
+                </button>
+
+                <h2 id="code-title" className="text-2xl font-extrabold tracking-tight">About my code</h2>
+                <p className="mt-3 leading-relaxed text-gray-700 text-4xl">
+                    Most of my work is private: client and pilot projects. The selected projects have live links, screenshots and
+                    case studies. I'm happy to do a live walkthrough or share access on request.
+                </p>
+
+                <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                    <button
+                        onClick={toProjects}
+                        className="inline-flex items-center justify-center gap-1 rounded-full bg-red-500 px-5 py-3 font-semibold text-white hover:bg-red-600 active:scale-95"
+                    >
+                        View selected projects <RiArrowRightUpLine className="text-xl" />
+                    </button>
+                    <a
+                        href="https://github.com/REVISIT-clouding"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 rounded-full border border-black px-5 py-3 font-semibold hover:bg-black hover:text-white active:scale-95"
+                    >
+                        <FaGithub className="text-xl" /> Visit GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 
 /* ---------- about modal ---------- */
 function AboutModal({ projects, skillNames, onClose }) {
@@ -345,13 +471,13 @@ function AboutModal({ projects, skillNames, onClose }) {
                 <button
                     onClick={onClose}
                     aria-label="Close"
-                    className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-gray-100 text-xl hover:bg-gray-200"
+                    className="absolute right-3 top-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-gray-100 text-xl hover:bg-gray-200"
                 >
                     <BiX />
                 </button>
 
                 <h2 id="about-title" className="text-3xl font-extrabold tracking-tight">About me</h2>
-                <p className="text-sm text-gray-600">Full-stack developer · Port Harcourt, Nigeria</p>
+                <p className="text-sm text-gray-600">Full-stack Software developer · Benin City, Nigeria</p>
 
                 <div className="mt-4 flex flex-col gap-3 text-sm leading-relaxed text-gray-700">
                     {ABOUT_FULL.map((p, i) => <p key={i}>{p}</p>)}
@@ -407,35 +533,37 @@ function Testimonials() {
 
     return (
         <section id="testimonials" className="scroll-mt-16 bg-gray-50 py-12">
-            <div className="px-5">
-                <p className="text-xs uppercase tracking-widest text-gray-500">Kind words</p>
-                <h1 className="py-3 text-4xl font-bold">
-                    WHAT PEOPLE <br /> SAY
-                </h1>
-            </div>
+            <Wrap>
+                <div className="px-5">
+                    <p className="text-xs uppercase tracking-widest text-gray-500">Kind words</p>
+                    <h1 className="py-3 text-4xl font-bold">
+                        WHAT PEOPLE <br /> SAY
+                    </h1>
+                </div>
 
-            <div className="mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {TESTIMONIALS.map((t, i) => (
-                    <figure
-                        key={i}
-                        className="flex min-w-[85%] snap-center flex-col justify-between rounded-3xl bg-white p-6 shadow-sm sm:min-w-[380px]"
-                    >
-                        <div>
-                            <span aria-hidden="true" className="block text-6xl font-extrabold leading-none text-red-500">“</span>
-                            <blockquote className="mt-2 text-gray-700">{t.quote}</blockquote>
-                        </div>
-                        <figcaption className="mt-6 flex items-center gap-3">
-                            <span className="grid h-11 w-11 flex-none place-items-center rounded-full bg-black font-bold text-white">
-                                {t.name?.[0] ?? "?"}
-                            </span>
-                            <span>
-                                <b className="block">{t.name}</b>
-                                <span className="text-sm text-gray-500">{t.role}</span>
-                            </span>
-                        </figcaption>
-                    </figure>
-                ))}
-            </div>
+                <div className="mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    {TESTIMONIALS.map((t, i) => (
+                        <figure
+                            key={i}
+                            className="flex min-w-[85%] snap-center flex-col justify-between rounded-3xl bg-white p-6 shadow-sm sm:min-w-[380px]"
+                        >
+                            <div>
+                                <span aria-hidden="true" className="block text-6xl font-extrabold leading-none text-red-500">“</span>
+                                <blockquote className="mt-2 text-gray-700">{t.quote}</blockquote>
+                            </div>
+                            <figcaption className="mt-6 flex items-center gap-3">
+                                <span className="grid h-11 w-11 flex-none place-items-center rounded-full bg-black font-bold text-white">
+                                    {t.name?.[0] ?? "?"}
+                                </span>
+                                <span>
+                                    <b className="block">{t.name}</b>
+                                    {t.role && <span className="text-sm text-gray-500">{t.role}</span>}
+                                </span>
+                            </figcaption>
+                        </figure>
+                    ))}
+                </div>
+            </Wrap>
         </section>
     );
 }
@@ -462,9 +590,8 @@ function StickyTalk() {
 
     return (
         <div
-            className={`fixed inset-x-0 bottom-4 z-40 flex justify-center px-4 transition-all duration-300 ${
-                hide ? "pointer-events-none translate-y-24 opacity-0" : "translate-y-0 opacity-100"
-            }`}
+            className={`fixed inset-x-0 bottom-4 z-40 flex justify-center px-4 transition-all duration-300 ${hide ? "pointer-events-none translate-y-24 opacity-0" : "translate-y-0 opacity-100"
+                }`}
             style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         >
             <div className="flex w-full max-w-md items-center justify-between gap-3 rounded-full bg-black p-2 pl-5 text-white shadow-2xl ring-1 ring-white/10">
@@ -489,6 +616,7 @@ function ContactSection() {
     const [name, setName] = useState("");
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const [notice, setNotice] = useState("");
 
     const body = () => `Hi Unique, ${message.trim()}${name.trim() ? `\n\n- ${name.trim()}` : ""}`;
 
@@ -497,9 +625,11 @@ function ContactSection() {
         if (!message.trim()) return setError("Write a short message first.");
         setError("");
         if (via === "whatsapp") {
+            setNotice("");
             window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(body())}`, "_blank", "noopener,noreferrer");
         } else {
             const subject = `Let's talk${name.trim() ? ` - ${name.trim()}` : ""}`;
+            setNotice(`If no mail app opened, write to me at ${EMAIL}`);
             window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body())}`;
         }
     };
@@ -512,90 +642,93 @@ function ContactSection() {
 
     return (
         <section id="contact" className="scroll-mt-16 bg-black px-5 pb-12 pt-14 text-white">
-            <p className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1 text-xs">
-                <PulseDot />
-                {STATUS}
-            </p>
+            <Wrap>
+                <p className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1 text-xs">
+                    <PulseDot />
+                    {STATUS}
+                </p>
 
-            <h2 className="mt-5 text-6xl font-extrabold leading-[0.9] tracking-tight sm:text-7xl">
-                LET'S
-                <br />
-                TALK<span className="text-red-500">.</span>
-            </h2>
-            <p className="mt-4 max-w-md text-gray-300">Got a project, a role or an idea? Tell me about it.</p>
+                <h2 className="mt-5 text-6xl font-extrabold leading-[0.9] tracking-tight sm:text-7xl">
+                    LET'S
+                    <br />
+                    TALK<span className="text-red-500">.</span>
+                </h2>
+                <p className="mt-4 max-w-md text-gray-300">Got a project, a role or an idea? Tell me about it.</p>
 
-            {/* big tappable contact rows */}
-            <div className="mt-8 grid gap-3">
-                {rows.map(({ label, value, href, icon: Icon, newTab }) => (
-                    <a
-                        key={label}
-                        href={href}
-                        {...(newTab && { target: "_blank", rel: "noopener noreferrer" })}
-                        className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-red-500 hover:bg-red-500"
-                    >
-                        <span className="grid h-12 w-12 flex-none place-items-center rounded-full bg-white/10 text-2xl group-hover:bg-white/20">
-                            <Icon />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                            <span className="block text-xs uppercase tracking-widest text-gray-400 group-hover:text-white/80">{label}</span>
-                            <span className="block truncate text-lg font-semibold">{value}</span>
-                        </span>
-                        <RiArrowRightUpLine className="flex-none text-2xl transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
-                    </a>
-                ))}
-            </div>
-
-            {/* quick message */}
-            <div className="mt-8 rounded-3xl bg-white p-5 text-black">
-                <h3 className="text-xl font-bold">Or leave a quick message</h3>
-                <p className="text-sm text-gray-600">It opens WhatsApp or your email app with your message ready to send.</p>
-
-                <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Your name"
-                    className="mt-4 w-full rounded-xl border p-3 outline-none focus:border-red-500"
-                />
-                <textarea
-                    value={message}
-                    onChange={(e) => { setMessage(e.target.value); setError(""); }}
-                    placeholder="What would you like to build?"
-                    rows={4}
-                    className="mt-3 w-full rounded-xl border p-3 outline-none focus:border-red-500"
-                />
-                {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
-
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                    <button
-                        onClick={() => send("whatsapp")}
-                        className="inline-flex items-center justify-center gap-2 rounded-full bg-red-500 px-5 py-3 font-semibold text-white transition hover:bg-red-600 active:scale-95"
-                    >
-                        <FaWhatsapp className="text-xl" /> Send on WhatsApp
-                    </button>
-                    <button
-                        onClick={() => send("email")}
-                        className="inline-flex items-center justify-center gap-2 rounded-full border border-black px-5 py-3 font-semibold transition hover:bg-black hover:text-white active:scale-95"
-                    >
-                        <BiEnvelope className="text-xl" /> Send by email
-                    </button>
+                {/* big tappable contact rows */}
+                <div className="mt-8 grid gap-3 md:grid-cols-3">
+                    {rows.map(({ label, value, href, icon: Icon, newTab }) => (
+                        <a
+                            key={label}
+                            href={href}
+                            {...(newTab && { target: "_blank", rel: "noopener noreferrer" })}
+                            className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-red-500 hover:bg-red-500"
+                        >
+                            <span className="grid h-12 w-12 flex-none place-items-center rounded-full bg-white/10 text-2xl group-hover:bg-white/20">
+                                <Icon />
+                            </span>
+                            <span className="min-w-0 flex-1">
+                                <span className="block text-xs uppercase tracking-widest text-gray-400 group-hover:text-white/80">{label}</span>
+                                <span className="block truncate text-lg font-semibold">{value}</span>
+                            </span>
+                            <RiArrowRightUpLine className="flex-none text-2xl transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
+                        </a>
+                    ))}
                 </div>
-            </div>
 
-            {/* socials */}
-            <div className="mt-6 flex flex-wrap gap-2">
-                {contacts.filter((c) => c.newTab).map(({ label, href, icon: Icon }) => (
-                    <a
-                        key={label}
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm transition hover:bg-white hover:text-black"
-                    >
-                        <Icon className="text-lg" /> {label}
-                    </a>
-                ))}
-            </div>
+                {/* quick message */}
+                <div className="mt-8 max-w-2xl rounded-3xl bg-white p-5 text-black">
+                    <h3 className="text-xl font-bold">Or leave a quick message</h3>
+                    <p className="text-sm text-gray-600">It opens WhatsApp or your email app with your message ready to send.</p>
+
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Your name"
+                        className="mt-4 w-full rounded-xl border p-3 outline-none focus:border-red-500"
+                    />
+                    <textarea
+                        value={message}
+                        onChange={(e) => { setMessage(e.target.value); setError(""); }}
+                        placeholder="What would you like to build?"
+                        rows={4}
+                        className="mt-3 w-full rounded-xl border p-3 outline-none focus:border-red-500"
+                    />
+                    {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+                    {notice && <p className="mt-2 text-sm text-gray-600">{notice}</p>}
+
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                        <button
+                            onClick={() => send("whatsapp")}
+                            className="inline-flex items-center justify-center gap-2 rounded-full bg-red-500 px-5 py-3 font-semibold text-white transition hover:bg-red-600 active:scale-95"
+                        >
+                            <FaWhatsapp className="text-xl" /> Send on WhatsApp
+                        </button>
+                        <button
+                            onClick={() => send("email")}
+                            className="inline-flex items-center justify-center gap-2 rounded-full border border-black px-5 py-3 font-semibold transition hover:bg-black hover:text-white active:scale-95"
+                        >
+                            <BiEnvelope className="text-xl" /> Send by email
+                        </button>
+                    </div>
+                </div>
+
+                {/* socials */}
+                <div className="mt-6 flex flex-wrap gap-2">
+                    {contacts.filter((c) => c.newTab).map(({ label, href, icon: Icon }) => (
+                        <a
+                            key={label}
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm transition hover:bg-white hover:text-black"
+                        >
+                            <Icon className="text-lg" /> {label}
+                        </a>
+                    ))}
+                </div>
+            </Wrap>
         </section>
     );
 }
@@ -604,7 +737,7 @@ function ContactSection() {
 function CvSection({ skillNames }) {
     const snapshot = [
         ["Role", "Full-stack developer"],
-        ["Based in", "Port Harcourt, Nigeria"],
+        ["Based in", "Bennin City, Nigeria"],
         ["Focus", "Multi-tenant and offline-first apps"],
         ["Core skills", skillNames.slice(0, 6).join(", ") || "-"],
     ];
@@ -615,70 +748,76 @@ function CvSection({ skillNames }) {
             className="scroll-mt-16 px-5 pt-14"
             style={{ paddingBottom: "max(2.5rem, env(safe-area-inset-bottom))" }}
         >
-            <p className="text-xs uppercase tracking-widest text-gray-500">Résumé</p>
-            <h2 className="mt-2 text-6xl font-extrabold leading-[0.9] tracking-tight">
-                MY
-                <br />
-                CV<span className="text-red-500">.</span>
-            </h2>
+            <Wrap>
+                <p className="text-xs uppercase tracking-widest text-gray-500">Résumé</p>
+                <h2 className="mt-2 text-6xl font-extrabold leading-[0.9] tracking-tight">
+                    MY
+                    <br />
+                    CV<span className="text-red-500">.</span>
+                </h2>
 
-            <div className="mt-6 rounded-3xl border p-5 shadow-sm">
-                <div className="flex items-center gap-4">
-                    <span className="grid h-14 w-14 flex-none place-items-center rounded-2xl bg-red-500 text-3xl text-white">
-                        <HiOutlineDocumentText />
-                    </span>
-                    <div>
-                        <b className="block text-lg">Unique</b>
-                        <span className="text-sm text-gray-600">Full-stack developer · PDF</span>
+                <span className="text-bold">Most of my code is in private repos. Happy to do a live walkthrough or share access.</span>
+
+                <div className="mt-6 max-w-xl rounded-3xl border p-5 shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <span className="grid h-14 w-14 flex-none place-items-center rounded-2xl bg-red-500 text-3xl text-white">
+                            <HiOutlineDocumentText />
+                        </span>
+                        <div>
+                            <b className="block text-lg">Unique</b>
+                            <span className="text-sm text-gray-600">Full-stack developer · PDF</span>
+                        </div>
+                    </div>
+
+                    <dl className="mt-5 divide-y text-sm">
+                        {snapshot.map(([k, v]) => (
+                            <div key={k} className="flex justify-between gap-4 py-2.5">
+                                <dt className="text-gray-500">{k}</dt>
+                                <dd className="text-right font-medium">{v}</dd>
+                            </div>
+                        ))}
+                    </dl>
+
+                    <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                        <a
+                            href={CV_URL}
+                            download="Unique-CV.pdf"
+                            className="inline-flex items-center justify-center gap-2 rounded-full bg-red-500 px-5 py-3 font-semibold text-white transition hover:bg-red-600 active:scale-95"
+                        >
+                            <BiDownload className="text-xl" /> Download CV
+                        </a>
+                        <a
+                            href={CV_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 rounded-full border border-black px-5 py-3 font-semibold transition hover:bg-black hover:text-white active:scale-95"
+                        >
+                            Open in new tab <RiExternalLinkFill />
+                        </a>
                     </div>
                 </div>
 
-                <dl className="mt-5 divide-y text-sm">
-                    {snapshot.map(([k, v]) => (
-                        <div key={k} className="flex justify-between gap-4 py-2.5">
-                            <dt className="text-gray-500">{k}</dt>
-                            <dd className="text-right font-medium">{v}</dd>
-                        </div>
-                    ))}
-                </dl>
-
-                <div className="mt-5 grid gap-2 sm:grid-cols-2">
-                    <a
-                        href={CV_URL}
-                        download="Unique-CV.pdf"
-                        className="inline-flex items-center justify-center gap-2 rounded-full bg-red-500 px-5 py-3 font-semibold text-white transition hover:bg-red-600 active:scale-95"
-                    >
-                        <BiDownload className="text-xl" /> Download CV
-                    </a>
-                    <a
-                        href={CV_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 rounded-full border border-black px-5 py-3 font-semibold transition hover:bg-black hover:text-white active:scale-95"
-                    >
-                        Open in new tab <RiExternalLinkFill />
-                    </a>
+                <div className="mt-10 flex items-center justify-between border-t pt-5 text-xs text-gray-500">
+                    <span>© {new Date().getFullYear()} Unique · Port Harcourt, Nigeria</span>
+                    <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="underline hover:text-black">
+                        Back to top ↑
+                    </button>
                 </div>
-            </div>
-
-            <div className="mt-10 flex items-center justify-between border-t pt-5 text-xs text-gray-500">
-                <span>© {new Date().getFullYear()} Unique · Port Harcourt, Nigeria</span>
-                <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="underline hover:text-black">
-                    Back to top ↑
-                </button>
-            </div>
+            </Wrap>
         </section>
     );
 }
 
 export default function Face() {
     const [contents, setContents] = useState([]);
+    const [loadingExp, setLoadingExp] = useState(true);
     const [selected, setSelected] = useState(null);
     const [aboutOpen, setAboutOpen] = useState(false);
     const [skills, setSkills] = useState([]);
     const [loadingSkills, setLoadingSkills] = useState(true);
     const [activeSkill, setActiveSkill] = useState(null); // skill name used to filter the projects
     const projectsRef = useRef(null);
+    const [codeOpen, setCodeOpen] = useState(false);
 
     const fetchAllExp = async () => {
         try {
@@ -693,6 +832,8 @@ export default function Face() {
             }
         } catch (error) {
             console.error("Fetch error:", error);
+        } finally {
+            setLoadingExp(false);
         }
     };
 
@@ -728,7 +869,11 @@ export default function Face() {
 
     const skillNames = skillList.map((s) => s.name);
     const maxCount = Math.max(1, ...skillList.map((s) => s.count));
-    const visible = activeSkill ? contents.filter((p) => usesSkill(p, activeSkill)) : contents;
+
+    // live / pilot projects first, then the rest in their original order
+    const visible = (activeSkill ? contents.filter((p) => usesSkill(p, activeSkill)) : contents)
+        .slice()
+        .sort((a, b) => Number(isLive(b.status)) - Number(isLive(a.status)));
 
     const pickSkill = (name) => {
         const next = activeSkill && norm(activeSkill) === norm(name) ? null : name;
@@ -744,261 +889,300 @@ export default function Face() {
             <section id="home" className="relative overflow-hidden px-5 pb-12 pt-6">
                 <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-red-500/15 blur-3xl" />
 
-                <Reveal>
-                    <div className="flex items-center gap-4">
-                        <div className="relative flex-none">
-                            <img
-                                src="/ppic.PNG"
-                                alt="Unique"
-                                width={96}
-                                height={96}
-                                className="h-24 w-24 rounded-full bg-red-500 object-cover shadow-xl ring-4 ring-white"
-                            />
-                            <span className="absolute bottom-1 right-1 grid h-6 w-6 place-items-center rounded-full bg-white shadow">
-                                <PulseDot />
-                            </span>
-                        </div>
-                        <div>
-                            <p className="text-lg font-semibold">Hello its Unique.</p>
-                            <p className="mt-1 inline-flex items-center gap-1 rounded-full border bg-white px-3 py-1 text-xs text-gray-600">
-                                <BiMap className="text-base" /> Benin City, Nigeria
-                            </p>
-                        </div>
-                    </div>
-                </Reveal>
-
-                <Reveal delay={100}>
-                    <h1 className="mt-7 text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-7xl">
-                        I build super powered computing projects{" "}
-                        <span className="relative whitespace-nowrap">
-                            that scale
-                            <svg
-                                aria-hidden="true"
-                                viewBox="0 0 120 8"
-                                preserveAspectRatio="none"
-                                className="absolute -bottom-2 left-0 h-2 w-full text-red-500"
-                            >
-                                <path
-                                    d="M0 4 Q 10 0 20 4 T 40 4 T 60 4 T 80 4 T 100 4 T 120 4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    strokeLinecap="round"
+                <Wrap>
+                    <Reveal>
+                        <div className="flex items-center gap-4">
+                            <div className="relative flex-none">
+                                <img
+                                    src="/ppic.PNG"
+                                    alt="Unique"
+                                    width={96}
+                                    height={96}
+                                    className="h-24 w-24 rounded-full bg-red-500 object-cover shadow-xl ring-4 ring-white"
                                 />
-                            </svg>
-                        </span>
-                        <span className="text-red-500">.</span>
-                    </h1>
-                </Reveal>
+                                <span className="absolute bottom-1 right-1 grid h-6 w-6 place-items-center rounded-full bg-white shadow">
+                                    <PulseDot />
+                                </span>
+                            </div>
+                            <div>
+                                <p className="text-lg font-semibold">Hello its Unique.</p>
+                                <p className="mt-1 inline-flex items-center gap-1 rounded-full border bg-white px-3 py-1 text-xs text-gray-600">
+                                    <BiMap className="text-base" /> Benin City, Nigeria
+                                </p>
+                            </div>
+                        </div>
+                    </Reveal>
 
-                {/* skills fetched from the skills table */}
-                <Reveal delay={200}>
-                    <div className="mt-7 flex flex-wrap items-center gap-2">
-                        {loadingSkills
-                            ? [1, 2, 3, 4].map((i) => <span key={i} className="h-8 w-20 animate-pulse rounded-full bg-gray-200" />)
-                            : skillNames.slice(0, 6).map((n) => (
-                                  <span key={n} className="rounded-full border bg-white px-3 py-1 text-sm shadow-sm">{n}</span>
-                              ))}
-                        {skillNames.length > 0 && (
-                            <button
-                                onClick={() => goTo("skills")}
-                                className="inline-flex items-center gap-1 px-2 py-1 text-sm font-semibold text-red-500 hover:underline"
-                            >
-                                See more <RiArrowRightUpLine className="text-lg" />
-                            </button>
-                        )}
-                    </div>
-                </Reveal>
+                    <Reveal delay={100}>
+                        <h1 className="mt-7 text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-7xl">
+                            I engineer super powered computing projects{" "}
+                            <span className="relative whitespace-nowrap">
+                                that scale
+                                <svg
+                                    aria-hidden="true"
+                                    viewBox="0 0 120 8"
+                                    preserveAspectRatio="none"
+                                    className="absolute -bottom-2 left-0 h-2 w-full text-red-500"
+                                >
+                                    <path
+                                        d="M0 4 Q 10 0 20 4 T 40 4 T 60 4 T 80 4 T 100 4 T 120 4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2.5"
+                                        strokeLinecap="round"
+                                    />
+                                </svg>
+                            </span>
+                            <span className="text-red-500">.</span>
+                        </h1>
+                    </Reveal>
 
-                <Reveal delay={250}>
-                    <div className="mt-5 text-sm items-center">
-                        <div>2+ years in production • 30 visits on my profile.</div>
-                    </div>
-                </Reveal>
+                    {/* skills fetched from the skills table */}
+                    <Reveal delay={200}>
+                        <div className="mt-7 flex flex-wrap items-center gap-2">
+                            {loadingSkills
+                                ? [1, 2, 3, 4].map((i) => <span key={i} className="h-8 w-20 animate-pulse rounded-full bg-gray-200" />)
+                                : skillNames.slice(0, 6).map((n) => (
+                                    <span key={n} className="rounded-full border bg-white px-3 py-1 text-sm shadow-sm">{n}</span>
+                                ))}
+                            {skillNames.length > 0 && (
+                                <button
+                                    onClick={() => goTo("skills")}
+                                    className="inline-flex items-center gap-1 px-2 py-1 text-sm font-semibold text-red-500 hover:underline"
+                                >
+                                    See more <RiArrowRightUpLine className="text-lg" />
+                                </button>
+                            )}
+                        </div>
+                    </Reveal>
 
-                <Reveal delay={300}>
-                    <div className="mt-8 flex flex-wrap gap-3">
-                        <a
-                            href={`tel:${PHONE}`}
-                            className="inline-flex items-center gap-2 rounded-full bg-red-500 px-6 py-3.5 font-semibold text-white shadow-md transition hover:bg-red-600 hover:shadow-lg active:scale-95"
-                        >
-                            <BiPhone className="text-xl" /> Book a call
-                        </a>
-                        <button
-                            onClick={() => goTo("cv")}
-                            className="inline-flex items-center gap-2 rounded-full border border-black px-6 py-3.5 font-semibold transition hover:bg-black hover:text-white active:scale-95"
-                        >
-                            <MdOutlineContactPage className="text-xl" /> View my CV
-                        </button>
-                    </div>
+                    <Reveal delay={250}>
+                        <div className="mt-5 text-sm items-center">
+                            <div>2+ years in Software development • 21 projects shipped(Most in private repo)</div>
+                        </div>
+                    </Reveal>
 
-                    <div className="mt-5 flex flex-wrap gap-2">
-                        {contacts.map(({ label, href, icon: Icon, newTab }) => (
+                    <Reveal delay={300}>
+                        <div className="mt-8 flex flex-wrap gap-3">
                             <a
-                                key={label}
-                                href={href}
-                                aria-label={label}
-                                title={label}
-                                {...(newTab && { target: "_blank", rel: "noopener noreferrer" })}
-                                className="grid h-11 w-11 place-items-center rounded-full border bg-white text-xl shadow-sm transition hover:-translate-y-0.5 hover:border-red-500 hover:bg-red-500 hover:text-white"
+                                href={`https://wa.me/${WHATSAPP}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 rounded-full bg-red-500 px-6 py-3.5 font-semibold text-white shadow-md transition hover:bg-red-600 hover:shadow-lg active:scale-95"
                             >
-                                <Icon />
+                                <FaWhatsapp className="text-xl" /> Chat on WhatsApp
                             </a>
-                        ))}
-                    </div>
-                </Reveal>
+                            <button
+                                onClick={() => goTo("cv")}
+                                className="inline-flex items-center gap-2 rounded-full border border-black px-6 py-3.5 font-semibold transition hover:bg-black hover:text-white active:scale-95"
+                            >
+                                <MdOutlineContactPage className="text-xl" /> View my CV
+                            </button>
+                        </div>
+
+                        <div className="mt-5 flex flex-wrap gap-2">
+                            {contacts.map(({ label, href, icon: Icon, newTab }) => {
+                                const cls =
+                                    "grid h-12 w-12 place-items-center rounded-full border bg-white text-xl shadow-sm transition hover:-translate-y-0.5 hover:border-red-500 hover:bg-red-500 hover:text-white";
+
+                                return label === "GitHub" ? (
+                                    <button key={label} onClick={() => setCodeOpen(true)} aria-label={label} title={label} className={cls}>
+                                        <Icon />
+                                    </button>
+                                ) : (
+                                    <a
+                                        key={label}
+                                        href={href}
+                                        aria-label={label}
+                                        title={label}
+                                        {...(newTab && { target: "_blank", rel: "noopener noreferrer" })}
+                                        className={cls}
+                                    >
+                                        <Icon />
+                                    </a>
+                                );
+                            })}
+                        </div>
+                    </Reveal>
+                </Wrap>
             </section>
 
             <SkillBand names={skillNames} />
 
             {/* ABOUT */}
             <section id="about" className="scroll-mt-16 px-5 py-4">
-                <Reveal>
-                    <p className="text-xs uppercase tracking-widest text-gray-500">About</p>
-                    <h2 className="mt-2 text-4xl font-extrabold leading-[1.02] tracking-tight">
-                        BUILDING THINGS <br /> THAT IMPACT<span className="text-red-500">.</span>
-                    </h2>
-                    <p className="mt-4 max-w-xl text-lg leading-relaxed text-gray-700">{ABOUT_INTRO}</p>
-                    <button
-                        onClick={() => setAboutOpen(true)}
-                        className="group mt-5 inline-flex items-center gap-2 rounded-full bg-black px-6 py-3 font-semibold text-white transition hover:bg-red-500 active:scale-95"
-                    >
-                        About me
-                        <RiArrowRightUpLine className="text-xl transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                    </button>
-                </Reveal>
+                <Wrap>
+                    <Reveal>
+                        <p className="text-xs uppercase tracking-widest text-gray-500">About</p>
+                        <h2 className="mt-2 text-4xl font-extrabold leading-[1.02] tracking-tight">
+                            BUILDING THINGS <br /> THAT IMPACT<span className="text-red-500">.</span>
+                        </h2>
+                        <p className="mt-4 max-w-xl text-lg leading-relaxed text-gray-700">{ABOUT_INTRO}</p>
+                        <button
+                            onClick={() => setAboutOpen(true)}
+                            className="group mt-5 inline-flex items-center gap-2 rounded-full bg-black px-6 py-3 font-semibold text-white transition hover:bg-red-500 active:scale-95"
+                        >
+                            About me
+                            <RiArrowRightUpLine className="text-xl transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                        </button>
+                    </Reveal>
+                </Wrap>
             </section>
 
-            {/* EXPERIENCE (dark) */}
+            {/* PROJECTS (dark) */}
             <section id="projects" className="scroll-mt-16 bg-black px-2 py-12 text-white">
-                <p className="text-xs uppercase tracking-widest text-gray-400">Experience</p>
-                <h1 ref={projectsRef} className="scroll-mt-20 py-3 text-4xl font-bold">SELECTED <br /> PROJECTS</h1>
+                <Wrap>
+                    <p className="text-xs uppercase tracking-widest text-gray-400">Work</p>
+                    <h1 ref={projectsRef} className="scroll-mt-20 py-3 text-4xl font-bold">SELECTED <br /> PROJECTS</h1>
 
-                {activeSkill && (
-                    <div className="mb-4 flex items-center justify-between gap-3 rounded-lg bg-red-500/15 px-4 py-2 text-sm text-red-100">
-                        <span>
-                            {visible.length} {visible.length === 1 ? "project" : "projects"} built with <b>{activeSkill}</b>
-                        </span>
-                        <button onClick={() => setActiveSkill(null)} className="font-semibold text-red-300 underline">
-                            Clear
-                        </button>
-                    </div>
-                )}
+                    {activeSkill && (
+                        <div className="mb-4 flex items-center justify-between gap-3 rounded-lg bg-red-500/15 px-4 py-2 text-sm text-red-100">
+                            <span>
+                                {visible.length} {visible.length === 1 ? "project" : "projects"} built with <b>{activeSkill}</b>
+                            </span>
+                            <button onClick={() => setActiveSkill(null)} className="font-semibold text-red-300 underline">
+                                Clear
+                            </button>
+                        </div>
+                    )}
 
-                {activeSkill && visible.length === 0 && (
-                    <p className="text-gray-400">None of your projects list {activeSkill} in their stack yet.</p>
-                )}
+                    {loadingExp && (
+                        <div className="grid gap-4 md:grid-cols-2">
+                            {[1, 2].map((i) => (
+                                <div key={i} className="h-72 animate-pulse rounded-2xl border border-white/10 bg-white/5" />
+                            ))}
+                        </div>
+                    )}
 
-                <div className="grid gap-4">
-                    {visible.map((item, index) => {
-                        const tags = stackOf(item.stack);
-                        return (
-                            <div key={item.id || index} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                                <div className="flex justify-between items-center">
-                                    <div className="flex gap-2 text-xs">
-                                        <span className="px-2 py-0.5 rounded bg-white/10">{item.mode}</span>
-                                        <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300">{item.status}</span>
+                    {!loadingExp && visible.length === 0 && !activeSkill && (
+                        <p className="text-gray-400">Projects are being added.</p>
+                    )}
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                        {visible.map((item, index) => {
+                            const tags = stackOf(item.stack);
+                            return (
+                                <div key={item.id || index} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex gap-2 text-xs">
+                                            <span className="px-2 py-0.5 rounded bg-white/10">{item.mode}</span>
+                                            {isLive(item.status) && (
+                                                <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300">{item.status}</span>
+                                            )}
+                                        </div>
                                     </div>
+
+                                    {item.img && (
+                                        <img src={item.img} alt="Preview" loading="lazy" decoding="async" className="my-3 h-44 w-full rounded-xl border border-white/10 object-cover" />
+                                    )}
+
+                                    <h3 className="mt-2 font-bold text-lg">{item.title}</h3>
+                                    <h3 className="font-bold text-md text-gray-200">{item.subtitle}</h3>
+                                    <p className="text-sm text-gray-400">{item.summary}</p>
+
+                                    {/* a few stack tags, the selected skill is highlighted */}
+                                    {tags.length > 0 && (
+                                        <div className="mt-3 flex flex-wrap gap-1.5">
+                                            {tags.slice(0, 4).map((t) => (
+                                                <span
+                                                    key={t}
+                                                    className={`rounded-full border px-2.5 py-0.5 text-xs ${activeSkill && norm(t) === norm(activeSkill)
+                                                            ? "border-red-500 bg-red-500 text-white"
+                                                            : "border-white/20"
+                                                        }`}
+                                                >
+                                                    {t}
+                                                </span>
+                                            ))}
+                                            {tags.length > 4 && <span className="px-1 text-xs text-gray-500">+{tags.length - 4} more</span>}
+                                        </div>
+                                    )}
+
+                                    <div className="mt-3 text-sm text-gray-400">{item.footerleft}</div>
+
+                                    {/* Opens the modal */}
+                                    <button
+                                        onClick={() => setSelected(item)}
+                                        className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-500 px-5 py-3 font-semibold text-white shadow-md transition hover:bg-red-600 hover:shadow-lg active:scale-95"
+                                    >
+                                        View project
+                                        <BiRightArrowAlt className="text-2xl transition-transform group-hover:translate-x-1" />
+                                    </button>
                                 </div>
-
-                                {item.img && (
-                                    <img src={item.img} alt="Preview" className="my-3 h-44 w-full rounded-xl border border-white/10 object-cover" />
-                                )}
-
-                                <h3 className="mt-2 font-bold text-lg">{item.title}</h3>
-                                <h3 className="font-bold text-md text-gray-200">{item.subtitle}</h3>
-                                <p className="text-sm text-gray-400">{item.summary}</p>
-
-                                {/* a few stack tags, the selected skill is highlighted */}
-                                {tags.length > 0 && (
-                                    <div className="mt-3 flex flex-wrap gap-1.5">
-                                        {tags.slice(0, 4).map((t) => (
-                                            <span
-                                                key={t}
-                                                className={`rounded-full border px-2.5 py-0.5 text-xs ${
-                                                    activeSkill && norm(t) === norm(activeSkill)
-                                                        ? "border-red-500 bg-red-500 text-white"
-                                                        : "border-white/20"
-                                                }`}
-                                            >
-                                                {t}
-                                            </span>
-                                        ))}
-                                        {tags.length > 4 && <span className="px-1 text-xs text-gray-500">+{tags.length - 4} more</span>}
-                                    </div>
-                                )}
-
-                                <div className="mt-3 text-sm text-gray-400">{item.footerLeft}</div>
-
-                                {/* Opens the modal */}
-                                <button
-                                    onClick={() => setSelected(item)}
-                                    className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-500 px-5 py-3 font-semibold text-white shadow-md transition hover:bg-red-600 hover:shadow-lg active:scale-95"
-                                >
-                                    View project
-                                    <BiRightArrowAlt className="text-2xl transition-transform group-hover:translate-x-1" />
-                                </button>
-                            </div>
-                        );
-                    })}
-                </div>
+                            );
+                        })}
+                    </div>
+                </Wrap>
             </section>
 
             {/* SKILLS */}
             <section id="skills" className="scroll-mt-16 px-5 py-14">
-                <Reveal>
-                    <p className="text-xs uppercase tracking-widest text-gray-500">Toolbox</p>
-                    <h2 className="mt-2 text-4xl font-extrabold tracking-tight">
-                        SKILLS<span className="text-red-500">.</span>
-                    </h2>
-                    <p className="mt-2 text-sm text-gray-600">
-                        Tap a skill to see the projects built with it. Bigger means used in more projects.
-                    </p>
-                </Reveal>
+                <Wrap>
+                    <Reveal>
+                        <p className="text-xs uppercase tracking-widest text-gray-500">Toolbox</p>
+                        <h2 className="mt-2 text-4xl font-extrabold tracking-tight">
+                            SKILLS<span className="text-red-500">.</span>
+                        </h2>
+                        <p className="mt-2 text-sm text-gray-600">
+                            Tap a skill with a number to see the projects built with it. Bigger means used in more projects.
+                        </p>
+                    </Reveal>
 
-                <Reveal delay={100}>
-                    <div className="mt-5 rounded-3xl border bg-white p-5 shadow-sm">
-                        {loadingSkills ? (
-                            <div className="flex flex-wrap gap-2">
-                                {[1, 2, 3, 4, 5, 6].map((i) => <span key={i} className="h-9 w-24 animate-pulse rounded-full bg-gray-200" />)}
-                            </div>
-                        ) : skillList.length === 0 ? (
-                            <p className="text-gray-500">No skills added yet.</p>
-                        ) : (
-                            <div className="flex flex-wrap items-center gap-2.5">
-                                {skillList.map(({ name, count }) => {
-                                    const on = activeSkill && norm(activeSkill) === norm(name);
-                                    return (
-                                        <button
-                                            key={name}
-                                            onClick={() => pickSkill(name)}
-                                            aria-pressed={!!on}
-                                            style={{ fontSize: `${(0.875 + (count / maxCount) * 0.75).toFixed(2)}rem` }}
-                                            className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-semibold transition hover:-translate-y-0.5 active:scale-95 ${
-                                                on ? "border-red-500 bg-red-500 text-white" : "bg-white hover:border-red-500"
-                                            }`}
-                                        >
-                                            {name}
-                                            <span
-                                                className={`grid h-5 min-w-5 place-items-center rounded-full px-1 text-xs font-bold ${
-                                                    on ? "bg-white/25" : "bg-gray-100 text-gray-600"
-                                                }`}
+                    <Reveal delay={100}>
+                        <div className="mt-5 rounded-3xl border bg-white p-5 shadow-sm">
+                            {loadingSkills ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {[1, 2, 3, 4, 5, 6].map((i) => <span key={i} className="h-9 w-24 animate-pulse rounded-full bg-gray-200" />)}
+                                </div>
+                            ) : skillList.length === 0 ? (
+                                <p className="text-gray-500">No skills added yet.</p>
+                            ) : (
+                                <div className="flex flex-wrap items-center gap-2.5">
+                                    {skillList.map(({ name, count }) => {
+                                        // no matching project: plain chip, no count, not clickable
+                                        if (count === 0) {
+                                            return (
+                                                <span
+                                                    key={name}
+                                                    className="inline-flex items-center rounded-full border bg-white px-4 py-1.5 text-sm font-semibold text-gray-700"
+                                                >
+                                                    {name}
+                                                </span>
+                                            );
+                                        }
+
+                                        const on = activeSkill && norm(activeSkill) === norm(name);
+                                        return (
+                                            <button
+                                                key={name}
+                                                onClick={() => pickSkill(name)}
+                                                aria-pressed={!!on}
+                                                style={{ fontSize: `${(0.875 + (count / maxCount) * 0.75).toFixed(2)}rem` }}
+                                                className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-semibold transition hover:-translate-y-0.5 active:scale-95 ${on ? "border-red-500 bg-red-500 text-white" : "bg-white hover:border-red-500"
+                                                    }`}
                                             >
-                                                {count}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-                </Reveal>
+                                                {name}
+                                                <span
+                                                    className={`grid h-5 min-w-5 place-items-center rounded-full px-1 text-xs font-bold ${on ? "bg-white/25" : "bg-gray-100 text-gray-600"
+                                                        }`}
+                                                >
+                                                    {count}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    </Reveal>
+                </Wrap>
             </section>
 
             <Testimonials />
 
             {selected && <ProjectModal item={selected} onClose={() => setSelected(null)} />}
             {aboutOpen && <AboutModal projects={contents} skillNames={skillNames} onClose={() => setAboutOpen(false)} />}
+            {codeOpen && <CodeModal onClose={() => setCodeOpen(false)} />}
 
             <ContactSection />
             <CvSection skillNames={skillNames} />
