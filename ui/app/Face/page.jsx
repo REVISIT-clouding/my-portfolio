@@ -330,11 +330,11 @@ function ProjectModal({ item, onClose }) {
 
                 <h2 id="project-title" className="mt-3 text-xl font-bold">{item.title}</h2>
                 <h3 className="text-sm font-semibold text-gray-800">{item.subtitle}</h3>
-                <p className="mt-2 text-sm text-gray-600">{item.summary}</p>
+                <p className=" whitespace-pre-line mt-2 text-sm text-gray-600">{item.summary}</p>
 
                 {overview && (
                     <ModalSection title="Overview">
-                        <p className="text-sm leading-relaxed text-gray-600">{overview}</p>
+                        <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">{overview}</p>
                     </ModalSection>
                 )}
 
