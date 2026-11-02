@@ -871,9 +871,8 @@ export default function Face() {
     const maxCount = Math.max(1, ...skillList.map((s) => s.count));
 
     // live / pilot projects first, then the rest in their original order
-    const visible = (activeSkill ? contents.filter((p) => usesSkill(p, activeSkill)) : contents)
-        .slice()
-        .sort((a, b) => Number(isLive(b.status)) - Number(isLive(a.status)));
+    // order comes from the database (display_order)
+const visible = activeSkill ? contents.filter((p) => usesSkill(p, activeSkill)) : contents;
 
     const pickSkill = (name) => {
         const next = activeSkill && norm(activeSkill) === norm(name) ? null : name;

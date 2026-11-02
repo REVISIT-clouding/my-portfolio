@@ -36,6 +36,7 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
     const [imgFile, setImgFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [displayOrder, setDisplayOrder] = useState(existing?.display_order ?? 100);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -65,6 +66,7 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
             fd.append("status", status);
             fd.append("mode", mode);
             fd.append("footerleft", footerleft);
+            fd.append("display_order", displayOrder);
             fd.append("href", formattedHref);
 
             if (imgFile) {

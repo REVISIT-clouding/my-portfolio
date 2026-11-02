@@ -44,6 +44,7 @@ export async function POST(req) {
         const href = formData.get("href");
         const status = formData.get("status");
         const imageFile = formData.get("img");
+        const display_order = parseInt(formData.get("display_order"), 10) || 100;
 
         let publicImageUrl = null;
 
@@ -92,6 +93,7 @@ export async function POST(req) {
             href: href || null,
             status: status || "In progress",
             img: publicImageUrl,
+            display_order,
         });
 
         if (dbError) {
@@ -117,10 +119,11 @@ export async function POST(req) {
 export async function GET(req) {
     try {
         const { data: fetchAll, error } = await supabaseAdmin
-            .from("experience")
-            .select("*")
-            .order("id", { ascending: false });
-
+    .from("experience")
+    .select("*")
+    .order("display_order", { ascending: true })
+    .order("inserted_at", { ascending: false });
+            
         if (error) {
             return NextResponse.json({ message: "Failed to fetch records", error: error.message }, { status: 500 });
         }
