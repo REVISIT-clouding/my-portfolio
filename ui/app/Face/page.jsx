@@ -798,7 +798,7 @@ function CvSection({ skillNames }) {
                 </div>
 
                 <div className="mt-10 flex items-center justify-between border-t pt-5 text-xs text-gray-500">
-                    <span>© {new Date().getFullYear()} Unique · Port Harcourt, Nigeria</span>
+                    <span>© {new Date().getFullYear()} Unique · Benin City, Nigeria</span>
                     <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="underline hover:text-black">
                         Back to top ↑
                     </button>

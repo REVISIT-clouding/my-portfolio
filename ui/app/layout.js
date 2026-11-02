@@ -12,8 +12,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Unique U Okeke",
-  description: "Software Developer & Founder",
+  title: "Unique Uchechukwu Okeke",
+  description: "Fullstack Software developer",
 };
 
 export default function RootLayout({ children }) {
