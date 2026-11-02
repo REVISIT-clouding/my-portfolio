@@ -1,0 +1,94 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+/* Tailwind v3 project? Delete the line above and use these three instead:
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+*/
+
+/* Design tokens (the page uses the same hex values directly) */
+:root {
+  --cream: #faf7f2;
+  --ink: #15171c;
+  --muted: #7a7568;
+  --line: #e6e0d5;
+  --chip: #f4f0e8;
+  --mint: #bdefc9;
+  --lilac: #d3c2f7;
+  --peach: #ffddba;
+  --sky: #c3e4fa;
+  --up: #1e8e5a;
+  --down: #d14343;
+  color-scheme: light; /* this design is light only */
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums; /* prices line up in columns */
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--mint);
+}
+
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+input,
+select {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Hides the scrollbar on horizontal card and chip rows */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Dialogs */
+dialog::backdrop {
+  backdrop-filter: blur(3px);
+}
+dialog[open] {
+  animation: pop 0.18s ease-out;
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
