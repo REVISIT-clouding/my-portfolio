@@ -147,6 +147,12 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
             </select>
 
             <input type="text" placeholder="Status of project" value={status} onChange={(e) => setStatus(e.target.value)} />
+            <input
+    type="number"
+    placeholder="Display order (1 = first)"
+    value={displayOrder}
+    onChange={(e) => setDisplayOrder(e.target.value)}
+/>
             <input type="text" placeholder="Link" value={href} onChange={(e) => setHref(e.target.value)} />
 
             <div className="flex gap-2">
@@ -448,6 +454,7 @@ export default function Admin() {
 
                                     <div className="mt-3 flex items-center justify-between text-sm text-gray-600">
                                         <span>{item.footerLeft ?? item.footerleft}</span>
+                                        <span className="rounded bg-yellow-100 px-2 py-0.5">#{item.display_order}</span>
                                         {item.href && (
                                             <a href={item.href} target="_blank" rel="noreferrer" className="font-semibold text-blue-600 underline">
                                                 View

@@ -45,6 +45,7 @@ export async function PUT(req, { params }) {
         const href = formData.get("href");
         const status = formData.get("status");
         const imageFile = formData.get("img");
+        const display_order = parseInt(formData.get("display_order"), 10) || 100;
         const existingImg = formData.get("existingImg");
 
         let publicImageUrl = existingImg || null;
