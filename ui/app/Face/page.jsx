@@ -913,9 +913,13 @@ export default function Face() {
                         </div>
                     </Reveal>
 
+                    <p className="mt-3 select-none font-mono text-[0.65rem] tracking-widest text-red-500 sm:text-xs">
+                        01010101 01001110 01001001 01010001 01010101 01000101
+                        <span className="mt-1 block text-gray-400">that's my name, in binary</span>
+                    </p>
                     <Reveal delay={100}>
-                        <h1 className="mt-7 text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-7xl">
-                            I engineer super powered computing projects{" "}
+                        <h1 className="mt-3 text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-7xl">
+                            I turn great ideas into 1s and 0s{" "}
                             <span className="relative whitespace-nowrap">
                                 that scale
                                 <svg
@@ -1087,8 +1091,8 @@ export default function Face() {
                                                 <span
                                                     key={t}
                                                     className={`rounded-full border px-2.5 py-0.5 text-xs ${activeSkill && norm(t) === norm(activeSkill)
-                                                            ? "border-red-500 bg-red-500 text-white"
-                                                            : "border-white/20"
+                                                        ? "border-red-500 bg-red-500 text-white"
+                                                        : "border-white/20"
                                                         }`}
                                                 >
                                                     {t}
