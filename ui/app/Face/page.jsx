@@ -332,7 +332,7 @@ function ProjectModal({ item, onClose }) {
                                 src={url}
                                 alt={item.title}
                                 loading="lazy"
-                                className="h-40 w-64 flex-none snap-center rounded-2xl border object-cover"
+                                className="h-60 w-64 flex-none snap-center rounded-2xl border object-cover"
                             />
                         ))}
                     </div>
@@ -1091,7 +1091,7 @@ export default function Face() {
                                     </div>
 
                                     {item.img && (
-                                        <img src={item.img} alt="Preview" loading="lazy" decoding="async" className="my-3 h-44 w-full rounded-xl border border-white/10 object-cover" />
+                                        <img src={item.img} alt="Preview" loading="lazy" decoding="async" className="my-3 h-80 w-full rounded-xl border border-white/10 object-cover" />
                                     )}
 
                                     <h3 className="mt-2 font-bold text-lg">{item.title}</h3>
