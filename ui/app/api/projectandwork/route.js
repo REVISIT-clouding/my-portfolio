@@ -14,6 +14,21 @@ const toList = (v) =>
         .map((x) => x.trim())
         .filter(Boolean);
 
+        async function uploadMany(files) {
+    const urls = [];
+    for (const f of files) {
+        if (!f || typeof f !== "object" || f.size === 0) continue;
+        const buf = Buffer.from(await f.arrayBuffer());
+        const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${f.name.replace(/\s/g, "_")}`;
+        const { error } = await supabaseAdmin.storage
+            .from("experience-images")
+            .upload(name, buf, { contentType: f.type, upsert: false });
+        if (error) throw new Error(error.message);
+        urls.push(supabaseAdmin.storage.from("experience-images").getPublicUrl(name).data.publicUrl);
+    }
+    return urls;
+}
+
 export async function POST(req) {
     try {
         // 1. Authenticate via custom JWT cookie
@@ -45,6 +60,8 @@ export async function POST(req) {
         const status = formData.get("status");
         const imageFile = formData.get("img");
         const display_order = parseInt(formData.get("display_order"), 10) || 100;
+        const project_date = formData.get("project_date") || null;
+const images = await uploadMany(formData.getAll("images"));
 
         let publicImageUrl = null;
 
@@ -94,6 +111,8 @@ export async function POST(req) {
             status: status || "In progress",
             img: publicImageUrl,
             display_order,
+            project_date,
+            images
         });
 
         if (dbError) {

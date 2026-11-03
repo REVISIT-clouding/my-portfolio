@@ -60,6 +60,8 @@ const norm = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9+#]/g, "");
 
 // only these statuses get a badge on the project cards
 const isLive = (s) => /live|pilot|deployed|shipped|production|completed/i.test(String(s || ""));
+const fmtDate = (d) =>
+    d ? new Date(d).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" }) : "";
 
 const skillName = (s) =>
     s?.name ?? s?.skill ?? s?.title ?? s?.label ??
@@ -322,6 +324,19 @@ function ProjectModal({ item, onClose }) {
                 {item.img && (
                     <img src={item.img} alt={item.title} decoding="async" className="mb-4 h-40 w-full rounded-2xl border object-cover" />
                 )}
+                {listOf(item.images).length > 0 && (
+                    <div className="mb-4 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2">
+                        {listOf(item.images).map((url) => (
+                            <img
+                                key={url}
+                                src={url}
+                                alt={item.title}
+                                loading="lazy"
+                                className="h-40 w-64 flex-none snap-center rounded-2xl border object-cover"
+                            />
+                        ))}
+                    </div>
+                )}
 
                 <div className="flex gap-2 text-xs">
                     <span className="rounded bg-gray-100 px-2 py-0.5">{item.mode}</span>
@@ -330,8 +345,8 @@ function ProjectModal({ item, onClose }) {
 
                 <h2 id="project-title" className="mt-3 text-xl font-bold">{item.title}</h2>
                 <h3 className="text-sm font-semibold text-gray-800">{item.subtitle}</h3>
-                <p className=" whitespace-pre-line mt-2 text-sm text-gray-600">{item.summary}</p>
-
+                <p className="whitespace-pre-line text-sm text-gray-400">{item.summary}</p>
+{item.project_date && <p className="mt-1 text-xs text-gray-500">{fmtDate(item.project_date)}</p>}
                 {overview && (
                     <ModalSection title="Overview">
                         <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">{overview}</p>
@@ -872,7 +887,7 @@ export default function Face() {
 
     // live / pilot projects first, then the rest in their original order
     // order comes from the database (display_order)
-const visible = activeSkill ? contents.filter((p) => usesSkill(p, activeSkill)) : contents;
+    const visible = activeSkill ? contents.filter((p) => usesSkill(p, activeSkill)) : contents;
 
     const pickSkill = (name) => {
         const next = activeSkill && norm(activeSkill) === norm(name) ? null : name;

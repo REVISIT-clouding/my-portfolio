@@ -36,6 +36,9 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
     const [imgFile, setImgFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [projectDate, setProjectDate] = useState(existing?.project_date ?? "");
+const [keptImages, setKeptImages] = useState(Array.isArray(existing?.images) ? existing.images : []);
+const [newFiles, setNewFiles] = useState([]);
     const [displayOrder, setDisplayOrder] = useState(existing?.display_order ?? 100);
 
     const handleSubmit = async (e) => {
@@ -68,6 +71,9 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
             fd.append("footerleft", footerleft);
             fd.append("display_order", displayOrder);
             fd.append("href", formattedHref);
+            fd.append("project_date", projectDate);
+fd.append("existingImages", JSON.stringify(keptImages));
+newFiles.forEach((f) => fd.append("images", f));
 
             if (imgFile) {
                 fd.append("img", imgFile);
@@ -140,6 +146,38 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
                     required={!editing} // Required only on create, optional on edit
                 />
             </div>
+            <label className="text-xs font-semibold text-gray-500">Project date</label>
+<input type="date" value={projectDate} onChange={(e) => setProjectDate(e.target.value)} />
+
+<div className="flex flex-col gap-1">
+    <label className="text-xs font-semibold text-gray-500">Gallery images (optional, pick several)</label>
+
+    {keptImages.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+            {keptImages.map((url) => (
+                <div key={url} className="relative">
+                    <img src={url} alt="" className="h-14 w-20 rounded border object-cover" />
+                    <button
+                        type="button"
+                        onClick={() => setKeptImages(keptImages.filter((u) => u !== url))}
+                        className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-red-500 text-xs text-white"
+                        aria-label="Remove image"
+                    >
+                        ×
+                    </button>
+                </div>
+            ))}
+        </div>
+    )}
+
+    <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={(e) => setNewFiles(Array.from(e.target.files))}
+    />
+    {newFiles.length > 0 && <span className="text-xs text-gray-400">{newFiles.length} new image(s) will be added.</span>}
+</div>
 
             <select value={mode} onChange={(e) => setMode(e.target.value)}>
                 <option value="work">Work</option>
