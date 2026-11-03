@@ -851,11 +851,39 @@ function CvSection({ skillNames }) {
     );
 }
 
+
+
+function EndorseButton({ name, endorse, onEndorse }) {
+    const key = norm(name);
+    const done = endorse.mine.includes(key);
+    const n = endorse.counts[key] || 0;
+    return (
+        <button
+            onClick={() => onEndorse(name)}
+            disabled={done}
+            title={done ? "You endorsed this" : `Endorse ${name}`}
+            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition active:scale-95 ${
+                done ? "border-red-500 bg-red-500 text-white" : "bg-white hover:border-red-500"
+            }`}
+        >
+            👍 {n > 0 ? n : "Endorse"}
+        </button>
+    );
+}
+
+const track = (type, ref) =>
+    fetch("/api/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, ref }),
+    }).catch(() => {});
+
 export default function Face() {
     const [contents, setContents] = useState([]);
     const [loadingExp, setLoadingExp] = useState(true);
     const [selected, setSelected] = useState(null);
     const [aboutOpen, setAboutOpen] = useState(false);
+    const [endorse, setEndorse] = useState({ counts: {}, mine: [] });
     const [skills, setSkills] = useState([]);
     const [loadingSkills, setLoadingSkills] = useState(true);
     const [activeSkill, setActiveSkill] = useState(null); // skill name used to filter the projects
@@ -894,6 +922,44 @@ export default function Face() {
             setLoadingSkills(false);
         }
     };
+
+    const fetchEndorse = async () => {
+    try {
+        const res = await fetch("/api/endorse", { cache: "no-store" });
+        if (res.ok) setEndorse(await res.json());
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+const endorseSkill = async (name) => {
+    const key = norm(name);
+    if (endorse.mine.includes(key)) return;
+    // show it instantly, then save
+    setEndorse((p) => ({
+        counts: { ...p.counts, [key]: (p.counts[key] || 0) + 1 },
+        mine: [...p.mine, key],
+    }));
+    try {
+        const res = await fetch("/api/endorse", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ skill: key }),
+        });
+        const data = await res.json();
+        if (data.already) fetchEndorse(); // server says already endorsed, resync
+    } catch {
+        fetchEndorse();
+    }
+};
+
+useEffect(() => {
+    try {
+        if (sessionStorage.getItem("visited")) return;
+        sessionStorage.setItem("visited", "1");
+    } catch {}
+    track("visit");
+}, []);
 
     useEffect(() => {
         fetchAllExp();
@@ -1148,7 +1214,7 @@ export default function Face() {
 
                                     {/* Opens the modal */}
                                     <button
-                                        onClick={() => setSelected(item)}
+                                        onClick={() => { setSelected(item); track("project_open", item.title); }}
                                         className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-500 px-5 py-3 font-semibold text-white shadow-md transition hover:bg-red-600 hover:shadow-lg active:scale-95"
                                     >
                                         View project
@@ -1170,7 +1236,7 @@ export default function Face() {
                             SKILLS<span className="text-red-500">.</span>
                         </h2>
                         <p className="mt-2 text-sm text-gray-600">
-                            Tap a skill with a number to see the projects built with it. Bigger means used in more projects.
+                            Tap a skill with a number to see the projects built with it. Tap on a skill to endorse.
                         </p>
                     </Reveal>
 
@@ -1187,32 +1253,33 @@ export default function Face() {
                                    {skillList.map(({ name, count }) => {
     // no matching project: plain chip, no count, not clickable
     if (count === 0) {
-        return (
-            <span
-                key={name}
-                className="inline-flex items-center gap-2 rounded-full border bg-white px-4 py-1.5 text-sm font-semibold text-gray-700"
-            >
-                <SkillIcon name={name} />
-                {name}
-            </span>
-        );
+      return (
+    <span key={name} className="inline-flex items-center gap-1">
+        <span className="inline-flex items-center gap-2 rounded-full border bg-white px-4 py-1.5 text-sm font-semibold text-gray-700">
+            <SkillIcon name={name} />
+            {name}
+        </span>
+        <EndorseButton name={name} endorse={endorse} onEndorse={endorseSkill} />
+    </span>
+);
     }
 
     const on = activeSkill && norm(activeSkill) === norm(name);
     return (
-        <button
-            key={name}
-            onClick={() => pickSkill(name)}
-            aria-pressed={!!on}
-            style={{ fontSize: `${(0.875 + (count / maxCount) * 0.75).toFixed(2)}rem` }}
-            className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-semibold transition hover:-translate-y-0.5 active:scale-95 ${
-                on ? "border-red-500 bg-red-500 text-white" : "bg-white hover:border-red-500"
-            }`}
-        >
-            <SkillIcon name={name} white={!!on} />
-            {name}
-            
-        </button>
+        <span key={name} className="inline-flex items-center gap-1">
+            <button
+                onClick={() => pickSkill(name)}
+                aria-pressed={!!on}
+                style={{ fontSize: `${(0.875 + (count / maxCount) * 0.75).toFixed(2)}rem` }}
+                className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-semibold transition hover:-translate-y-0.5 active:scale-95 ${
+                    on ? "border-red-500 bg-red-500 text-white" : "bg-white hover:border-red-500"
+                }`}
+            >
+                <SkillIcon name={name} white={!!on} />
+                {name}
+            </button>
+            <EndorseButton name={name} endorse={endorse} onEndorse={endorseSkill} />
+        </span>
     );
 })}
                                 </div>

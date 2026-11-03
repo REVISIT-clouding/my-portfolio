@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BiBriefcase, BiCodeBlock, BiEdit, BiTrash, BiX } from "react-icons/bi";
+import { BiBarChartAlt2, BiBriefcase, BiCodeBlock, BiEdit, BiTrash, BiX } from "react-icons/bi";
 import { FcAddDatabase } from "react-icons/fc";
 import { SiSkillshare } from "react-icons/si";
 
@@ -260,8 +260,103 @@ export function CreateSkill({ onSuccess }) {
     );
 }
 
+
+function Dashboard({ projects, skills }) {
+    const [s, setS] = useState(null);
+    const [err, setErr] = useState("");
+
+    useEffect(() => {
+        fetch("/api/stats", { cache: "no-store" })
+            .then(async (r) => {
+                const d = await r.json();
+                r.ok ? setS(d) : setErr(d.message || "Failed to load stats");
+            })
+            .catch(() => setErr("Something went wrong"));
+    }, []);
+
+    if (err)
+        return (
+            <p role="alert" className="rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-600">
+                {err}
+            </p>
+        );
+    if (!s) return <p className="text-sm text-gray-500">Loading dashboard...</p>;
+
+    const max = Math.max(1, ...s.days.map((d) => d.visits));
+    const cards = [
+        ["Visits (30d)", s.visits30],
+        ["Unique visitors (30d)", s.unique30],
+        ["Project opens (30d)", s.opens30],
+        ["Endorsements", s.endorsements],
+        ["Projects", projects],
+        ["Skills", skills],
+    ];
+
+    const List = ({ title, rows }) => (
+        <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h3 className="mb-3 text-xs uppercase tracking-widest text-gray-500">{title}</h3>
+            {rows.length === 0 ? (
+                <p className="text-sm text-gray-400">No data yet.</p>
+            ) : (
+                <ul className="divide-y divide-gray-100 text-sm">
+                    {rows.map((r) => (
+                        <li key={r.name} className="flex justify-between py-2">
+                            <span className="truncate pr-3 text-gray-700">{r.name}</span>
+                            <b className="text-black">{r.count}</b>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+
+    return (
+        <div className="space-y-6 text-black">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+                {cards.map(([label, value]) => (
+                    <div key={label} className="rounded-2xl border border-gray-200 bg-white p-5">
+                        <p className="text-xs uppercase tracking-widest text-gray-500">{label}</p>
+                        <p className="mt-2 text-4xl font-extrabold leading-none tracking-tight">
+                            {value}
+                            <span className="text-red-500">.</span>
+                        </p>
+                    </div>
+                ))}
+            </div>
+
+            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                <h3 className="mb-4 text-xs uppercase tracking-widest text-gray-500">Visits, last 14 days</h3>
+                <div className="flex h-40 items-end gap-1.5">
+                    {s.days.map((d, i) => {
+                        const last = i === s.days.length - 1;
+                        return (
+                            <div key={d.day} className="group flex h-full flex-1 flex-col justify-end" title={`${d.day}: ${d.visits}`}>
+                                <span className={`text-center text-[10px] ${last ? "font-semibold text-black" : "text-gray-400"}`}>{d.visits}</span>
+                                <div
+                                    className={`rounded-t transition-colors ${last ? "bg-red-500" : "bg-gray-200 group-hover:bg-red-400"}`}
+                                    style={{ height: `${(d.visits / max) * 100}%`, minHeight: 2 }}
+                                />
+                            </div>
+                        );
+                    })}
+                </div>
+                <div className="mt-2 flex justify-between text-[10px] text-gray-500">
+                    <span>{s.days[0].day.slice(5)}</span>
+                    <span>{s.days[s.days.length - 1].day.slice(5)}</span>
+                </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+                <List title="Most opened projects" rows={s.topProjects} />
+                <List title="Most endorsed skills" rows={s.topSkills} />
+                <List title="Visitor countries" rows={s.countries} />
+            </div>
+        </div>
+    );
+}
+
 export default function Admin() {
-    const [view, setView] = useState("experience"); // "experience" | "skills"
+     const [view, setView] = useState("dashboard");
     const [addOpen, setAddOpen] = useState(false);
     const [editing, setEditing] = useState(null); // the experience item being edited
     const [contents, setContents] = useState([]);
@@ -310,10 +405,12 @@ export default function Admin() {
         setEditing(null);
     };
 
-    const nav = [
-        ["experience", "Experience", BiBriefcase, contents.length],
-        ["skills", "Skills", SiSkillshare, skills.length],
-    ];
+
+const nav = [
+    ["dashboard", "Dashboard", BiBarChartAlt2, null],
+    ["experience", "Experience", BiBriefcase, contents.length],
+    ["skills", "Skills", SiSkillshare, skills.length],
+];
 
     const startEdit = (item) => {
         setAddOpen(false);
@@ -371,47 +468,51 @@ export default function Admin() {
     return (
         <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
             {/* SIDEBAR (a top tab strip on phones) */}
-            <aside className="flex gap-2 border-b bg-white p-3 md:min-h-screen md:w-56 md:flex-col md:border-b-0 md:border-r md:p-4">
-                <h1 className="hidden px-2 pb-3 text-lg font-bold md:block">Admin</h1>
-                {nav.map(([key, label, Icon, count]) => (
-                    <button
-                        key={key}
-                        onClick={() => switchView(key)}
-                        aria-current={view === key ? "page" : undefined}
-                        className={`flex flex-1 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium md:flex-none ${
-                            view === key ? "bg-blue-500 text-white" : "hover:bg-gray-100"
-                        }`}
-                    >
-                        <Icon className="text-xl" />
-                        {label}
-                        <span className="ml-auto rounded-full bg-black/10 px-2 text-xs">{count}</span>
-                    </button>
-                ))}
-            </aside>
+       <aside className="flex gap-2 border-b bg-white p-3 md:min-h-screen md:w-56 md:flex-col md:border-b-0 md:border-r md:p-4">
+    <h1 className="hidden px-2 pb-3 text-lg font-bold md:block">Admin</h1>
+    {nav.map(([key, label, Icon, count]) => (
+        <button
+            key={key}
+            onClick={() => switchView(key)}
+            aria-current={view === key ? "page" : undefined}
+            className={`flex flex-1 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium md:flex-none ${
+                view === key ? "bg-blue-500 text-white" : "hover:bg-gray-100"
+            }`}
+        >
+            <Icon className="text-xl" />
+            {label}
+            {count !== null && (
+                <span className="ml-auto rounded-full bg-black/10 px-2 text-xs">{count}</span>
+            )}
+        </button>
+    ))}
+</aside>
 
-            {/* MAIN */}
-            <main className="flex-1 p-6">
-                <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-                    <h1 className="text-2xl font-bold">
-                        {view === "experience" ? "Experience" : "Skills"}
-                    </h1>
-                    <button
-                        onClick={() => {
-                            if (editing) setEditing(null);
-                            else setAddOpen(!addOpen);
-                        }}
-                        className="flex cursor-pointer items-center gap-2 rounded-md bg-gray-200 p-2 transition active:scale-95"
-                    >
-                        <span>
-                            {formOpen ? "Close Form" : view === "experience" ? "Add Experience" : "Add New Skill"}
-                        </span>
-                        {view === "experience" ? (
-                            <FcAddDatabase size={30} />
-                        ) : (
-                            <BiCodeBlock size={30} className="text-green-500" />
-                        )}
-                    </button>
-                </div>
+{/* MAIN */}
+<main className="flex-1 p-6">
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">
+            {view === "dashboard" ? "Dashboard" : view === "experience" ? "Experience" : "Skills"}
+        </h1>
+        {view !== "dashboard" && (
+            <button
+                onClick={() => {
+                    if (editing) setEditing(null);
+                    else setAddOpen(!addOpen);
+                }}
+                className="flex cursor-pointer items-center gap-2 rounded-md bg-gray-200 p-2 transition active:scale-95"
+            >
+                <span>{formOpen ? "Close Form" : view === "experience" ? "Add Experience" : "Add New Skill"}</span>
+                {view === "experience" ? (
+                    <FcAddDatabase size={30} />
+                ) : (
+                    <BiCodeBlock size={30} className="text-green-500" />
+                )}
+            </button>
+        )}
+    </div>
+
+    {view === "dashboard" && <Dashboard projects={contents.length} skills={skills.length} />}
 
                 {/* EXPERIENCE */}
                 {view === "experience" && (
