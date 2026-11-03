@@ -96,6 +96,34 @@ function PulseDot() {
         </span>
     );
 }
+/* skill logos from Simple Icons, looked up by skill name */
+const SLUG_FIX = {
+    nextjs: "nextdotjs", nodejs: "nodedotjs", vuejs: "vuedotjs", reactjs: "react",
+    expressjs: "express", postgres: "postgresql", tailwind: "tailwindcss",
+    js: "javascript", ts: "typescript",
+};
+const iconSlug = (s) => {
+    const base = String(s || "").toLowerCase()
+        .replace(/\./g, "dot").replace(/\+/g, "plus").replace(/#/g, "sharp").replace(/&/g, "and")
+        .replace(/[^a-z0-9]/g, "");
+    return SLUG_FIX[base] || base;
+};
+
+function SkillIcon({ name, white = false }) {
+    const [ok, setOk] = useState(true);
+    const slug = iconSlug(name);
+    if (!ok || !slug) return null;
+    return (
+        <img
+            src={`https://cdn.simpleicons.org/${slug}${white ? "/ffffff" : ""}`}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            onError={() => setOk(false)}
+            className="h-[1.1em] w-[1.1em] flex-none"
+        />
+    );
+}
 
 /* ---------- fade-up on scroll ---------- */
 function Reveal({ children, className = "", delay = 0 }) {
@@ -1171,22 +1199,13 @@ export default function Face() {
 
                                         const on = activeSkill && norm(activeSkill) === norm(name);
                                         return (
-                                            <button
-                                                key={name}
-                                                onClick={() => pickSkill(name)}
-                                                aria-pressed={!!on}
-                                                style={{ fontSize: `${(0.875 + (count / maxCount) * 0.75).toFixed(2)}rem` }}
-                                                className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-semibold transition hover:-translate-y-0.5 active:scale-95 ${on ? "border-red-500 bg-red-500 text-white" : "bg-white hover:border-red-500"
-                                                    }`}
-                                            >
-                                                {name}
-                                                <span
-                                                    className={`grid h-5 min-w-5 place-items-center rounded-full px-1 text-xs font-bold ${on ? "bg-white/25" : "bg-gray-100 text-gray-600"
-                                                        }`}
-                                                >
-                                                    {count}
-                                                </span>
-                                            </button>
+                                            <span
+    key={name}
+    className="inline-flex items-center gap-2 rounded-full border bg-white px-4 py-1.5 text-sm font-semibold text-gray-700"
+>
+    <SkillIcon name={name} />
+    {name}
+</span>
                                         );
                                     })}
                                 </div>
