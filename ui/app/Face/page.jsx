@@ -374,7 +374,7 @@ function ProjectModal({ item, onClose }) {
                 <h2 id="project-title" className="mt-3 text-xl font-bold">{item.title}</h2>
                 <h3 className="text-sm font-semibold text-gray-800">{item.subtitle}</h3>
                 <p className="whitespace-pre-line text-sm text-gray-400">{item.summary}</p>
-{item.project_date && <p className="mt-1 text-xs text-gray-500">{fmtDate(item.project_date)}</p>}
+                {item.project_date && <p className="mt-1 text-xs text-gray-500">{fmtDate(item.project_date)}</p>}
                 {overview && (
                     <ModalSection title="Overview">
                         <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">{overview}</p>
@@ -1184,30 +1184,43 @@ export default function Face() {
                                 <p className="text-gray-500">No skills added yet.</p>
                             ) : (
                                 <div className="flex flex-wrap items-center gap-2.5">
-                                    {skillList.map(({ name, count }) => {
-                                        // no matching project: plain chip, no count, not clickable
-                                        if (count === 0) {
-                                            return (
-                                                <span
-                                                    key={name}
-                                                    className="inline-flex items-center rounded-full border bg-white px-4 py-1.5 text-sm font-semibold text-gray-700"
-                                                >
-                                                    {name}
-                                                </span>
-                                            );
-                                        }
+                                   {skillList.map(({ name, count }) => {
+    // no matching project: plain chip, no count, not clickable
+    if (count === 0) {
+        return (
+            <span
+                key={name}
+                className="inline-flex items-center gap-2 rounded-full border bg-white px-4 py-1.5 text-sm font-semibold text-gray-700"
+            >
+                <SkillIcon name={name} />
+                {name}
+            </span>
+        );
+    }
 
-                                        const on = activeSkill && norm(activeSkill) === norm(name);
-                                        return (
-                                            <span
-    key={name}
-    className="inline-flex items-center gap-2 rounded-full border bg-white px-4 py-1.5 text-sm font-semibold text-gray-700"
->
-    <SkillIcon name={name} />
-    {name}
-</span>
-                                        );
-                                    })}
+    const on = activeSkill && norm(activeSkill) === norm(name);
+    return (
+        <button
+            key={name}
+            onClick={() => pickSkill(name)}
+            aria-pressed={!!on}
+            style={{ fontSize: `${(0.875 + (count / maxCount) * 0.75).toFixed(2)}rem` }}
+            className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 font-semibold transition hover:-translate-y-0.5 active:scale-95 ${
+                on ? "border-red-500 bg-red-500 text-white" : "bg-white hover:border-red-500"
+            }`}
+        >
+            <SkillIcon name={name} white={!!on} />
+            {name}
+            <span
+                className={`grid h-5 min-w-5 place-items-center rounded-full px-1 text-xs font-bold ${
+                    on ? "bg-white/25" : "bg-gray-100 text-gray-600"
+                }`}
+            >
+                {count}
+            </span>
+        </button>
+    );
+})}
                                 </div>
                             )}
                         </div>
