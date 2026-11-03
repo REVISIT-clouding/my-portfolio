@@ -282,11 +282,21 @@ function Header() {
                         </nav>
 
                         <button
-                            onClick={() => go("contact")}
-                            className="mt-6 inline-flex items-center justify-center gap-1 rounded-full bg-red-500 py-3.5 font-semibold hover:bg-red-600"
-                        >
-                            Let's talk <RiArrowRightUpLine className="text-xl" />
-                        </button>
+    onClick={() => go("contact")}
+    className="mt-6 inline-flex items-center justify-center gap-1 rounded-full bg-red-500 py-3.5 font-semibold hover:bg-red-600"
+>
+    Let's talk <RiArrowRightUpLine className="text-xl" />
+</button>
+
+<div className="mt-6 flex justify-center">
+    <a
+        href="/login"
+        aria-label="Sign in"
+        className="p-2 text-white/20 transition hover:text-white/60"
+    >
+        <BiLock className="text-base" />
+    </a>
+</div>
                     </Wrap>
                 </div>
             )}
@@ -1236,7 +1246,7 @@ useEffect(() => {
                             SKILLS<span className="text-red-500">.</span>
                         </h2>
                         <p className="mt-2 text-sm text-gray-600">
-                            Tap a skill with a number to see the projects built with it. Tap on a skill to endorse.
+                            Tap a skill to see the projects built with it. Tap 👍 to endorse.
                         </p>
                     </Reveal>
 

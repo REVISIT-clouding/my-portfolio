@@ -21,7 +21,7 @@ export async function GET() {
         const [ev, en] = await Promise.all([
             supabaseAdmin
                 .from("site_events")
-                .select("type, ref, visitor_hash, country, created_at")
+               .select("type, ref, visitor_hash, country, created_at, device, os, browser")
                 .gte("created_at", since)
                 .limit(10000),
             supabaseAdmin.from("skill_endorsements").select("skill_name"),
@@ -44,6 +44,11 @@ export async function GET() {
         });
 
         const byProject = {}, byCountry = {}, bySkill = {};
+        const byDevice = {}, byBrowser = {};
+visits.forEach((v) => {
+    if (v.device) byDevice[v.device] = (byDevice[v.device] || 0) + 1;
+    if (v.browser) byBrowser[v.browser] = (byBrowser[v.browser] || 0) + 1;
+});
         opens.forEach((o) => { if (o.ref) byProject[o.ref] = (byProject[o.ref] || 0) + 1; });
         visits.forEach((v) => { if (v.country) byCountry[v.country] = (byCountry[v.country] || 0) + 1; });
         (en.data || []).forEach((r) => { bySkill[r.skill_name] = (bySkill[r.skill_name] || 0) + 1; });
@@ -57,6 +62,8 @@ export async function GET() {
             topProjects: top(byProject),
             topSkills: top(bySkill),
             countries: top(byCountry),
+            devices: top(byDevice),
+browsers: top(byBrowser),
         });
     } catch (err) {
         return NextResponse.json({ message: err.message }, { status: 500 });

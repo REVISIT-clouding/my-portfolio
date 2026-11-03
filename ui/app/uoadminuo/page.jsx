@@ -37,8 +37,8 @@ export function CreateEXP({ onSuccess, existing, onCancel }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [projectDate, setProjectDate] = useState(existing?.project_date ?? "");
-const [keptImages, setKeptImages] = useState(Array.isArray(existing?.images) ? existing.images : []);
-const [newFiles, setNewFiles] = useState([]);
+    const [keptImages, setKeptImages] = useState(Array.isArray(existing?.images) ? existing.images : []);
+    const [newFiles, setNewFiles] = useState([]);
     const [displayOrder, setDisplayOrder] = useState(existing?.display_order ?? 100);
 
     const handleSubmit = async (e) => {
@@ -72,8 +72,8 @@ const [newFiles, setNewFiles] = useState([]);
             fd.append("display_order", displayOrder);
             fd.append("href", formattedHref);
             fd.append("project_date", projectDate);
-fd.append("existingImages", JSON.stringify(keptImages));
-newFiles.forEach((f) => fd.append("images", f));
+            fd.append("existingImages", JSON.stringify(keptImages));
+            newFiles.forEach((f) => fd.append("images", f));
 
             if (imgFile) {
                 fd.append("img", imgFile);
@@ -147,37 +147,37 @@ newFiles.forEach((f) => fd.append("images", f));
                 />
             </div>
             <label className="text-xs font-semibold text-gray-500">Project date</label>
-<input type="date" value={projectDate} onChange={(e) => setProjectDate(e.target.value)} />
+            <input type="date" value={projectDate} onChange={(e) => setProjectDate(e.target.value)} />
 
-<div className="flex flex-col gap-1">
-    <label className="text-xs font-semibold text-gray-500">Gallery images (optional, pick several)</label>
+            <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-gray-500">Gallery images (optional, pick several)</label>
 
-    {keptImages.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-            {keptImages.map((url) => (
-                <div key={url} className="relative">
-                    <img src={url} alt="" className="h-14 w-20 rounded border object-cover" />
-                    <button
-                        type="button"
-                        onClick={() => setKeptImages(keptImages.filter((u) => u !== url))}
-                        className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-red-500 text-xs text-white"
-                        aria-label="Remove image"
-                    >
-                        ×
-                    </button>
-                </div>
-            ))}
-        </div>
-    )}
+                {keptImages.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                        {keptImages.map((url) => (
+                            <div key={url} className="relative">
+                                <img src={url} alt="" className="h-14 w-20 rounded border object-cover" />
+                                <button
+                                    type="button"
+                                    onClick={() => setKeptImages(keptImages.filter((u) => u !== url))}
+                                    className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-red-500 text-xs text-white"
+                                    aria-label="Remove image"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
-    <input
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={(e) => setNewFiles(Array.from(e.target.files))}
-    />
-    {newFiles.length > 0 && <span className="text-xs text-gray-400">{newFiles.length} new image(s) will be added.</span>}
-</div>
+                <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => setNewFiles(Array.from(e.target.files))}
+                />
+                {newFiles.length > 0 && <span className="text-xs text-gray-400">{newFiles.length} new image(s) will be added.</span>}
+            </div>
 
             <select value={mode} onChange={(e) => setMode(e.target.value)}>
                 <option value="work">Work</option>
@@ -186,11 +186,11 @@ newFiles.forEach((f) => fd.append("images", f));
 
             <input type="text" placeholder="Status of project" value={status} onChange={(e) => setStatus(e.target.value)} />
             <input
-    type="number"
-    placeholder="Display order (1 = first)"
-    value={displayOrder}
-    onChange={(e) => setDisplayOrder(e.target.value)}
-/>
+                type="number"
+                placeholder="Display order (1 = first)"
+                value={displayOrder}
+                onChange={(e) => setDisplayOrder(e.target.value)}
+            />
             <input type="text" placeholder="Link" value={href} onChange={(e) => setHref(e.target.value)} />
 
             <div className="flex gap-2">
@@ -351,12 +351,16 @@ function Dashboard({ projects, skills }) {
                 <List title="Most endorsed skills" rows={s.topSkills} />
                 <List title="Visitor countries" rows={s.countries} />
             </div>
+            <div className="grid gap-4 md:grid-cols-2">
+                <List title="Devices" rows={s.devices || []} />
+                <List title="Browsers" rows={s.browsers || []} />
+            </div>
         </div>
     );
 }
 
 export default function Admin() {
-     const [view, setView] = useState("dashboard");
+    const [view, setView] = useState("dashboard");
     const [addOpen, setAddOpen] = useState(false);
     const [editing, setEditing] = useState(null); // the experience item being edited
     const [contents, setContents] = useState([]);
@@ -406,11 +410,11 @@ export default function Admin() {
     };
 
 
-const nav = [
-    ["dashboard", "Dashboard", BiBarChartAlt2, null],
-    ["experience", "Experience", BiBriefcase, contents.length],
-    ["skills", "Skills", SiSkillshare, skills.length],
-];
+    const nav = [
+        ["dashboard", "Dashboard", BiBarChartAlt2, null],
+        ["experience", "Experience", BiBriefcase, contents.length],
+        ["skills", "Skills", SiSkillshare, skills.length],
+    ];
 
     const startEdit = (item) => {
         setAddOpen(false);
@@ -468,51 +472,50 @@ const nav = [
     return (
         <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
             {/* SIDEBAR (a top tab strip on phones) */}
-       <aside className="flex gap-2 border-b bg-white p-3 md:min-h-screen md:w-56 md:flex-col md:border-b-0 md:border-r md:p-4">
-    <h1 className="hidden px-2 pb-3 text-lg font-bold md:block">Admin</h1>
-    {nav.map(([key, label, Icon, count]) => (
-        <button
-            key={key}
-            onClick={() => switchView(key)}
-            aria-current={view === key ? "page" : undefined}
-            className={`flex flex-1 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium md:flex-none ${
-                view === key ? "bg-blue-500 text-white" : "hover:bg-gray-100"
-            }`}
-        >
-            <Icon className="text-xl" />
-            {label}
-            {count !== null && (
-                <span className="ml-auto rounded-full bg-black/10 px-2 text-xs">{count}</span>
-            )}
-        </button>
-    ))}
-</aside>
+            <aside className="flex gap-2 border-b bg-white p-3 md:min-h-screen md:w-56 md:flex-col md:border-b-0 md:border-r md:p-4">
+                <h1 className="hidden px-2 pb-3 text-lg font-bold md:block">Admin</h1>
+                {nav.map(([key, label, Icon, count]) => (
+                    <button
+                        key={key}
+                        onClick={() => switchView(key)}
+                        aria-current={view === key ? "page" : undefined}
+                        className={`flex flex-1 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium md:flex-none ${view === key ? "bg-blue-500 text-white" : "hover:bg-gray-100"
+                            }`}
+                    >
+                        <Icon className="text-xl" />
+                        {label}
+                        {count !== null && (
+                            <span className="ml-auto rounded-full bg-black/10 px-2 text-xs">{count}</span>
+                        )}
+                    </button>
+                ))}
+            </aside>
 
-{/* MAIN */}
-<main className="flex-1 p-6">
-    <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">
-            {view === "dashboard" ? "Dashboard" : view === "experience" ? "Experience" : "Skills"}
-        </h1>
-        {view !== "dashboard" && (
-            <button
-                onClick={() => {
-                    if (editing) setEditing(null);
-                    else setAddOpen(!addOpen);
-                }}
-                className="flex cursor-pointer items-center gap-2 rounded-md bg-gray-200 p-2 transition active:scale-95"
-            >
-                <span>{formOpen ? "Close Form" : view === "experience" ? "Add Experience" : "Add New Skill"}</span>
-                {view === "experience" ? (
-                    <FcAddDatabase size={30} />
-                ) : (
-                    <BiCodeBlock size={30} className="text-green-500" />
-                )}
-            </button>
-        )}
-    </div>
+            {/* MAIN */}
+            <main className="flex-1 p-6">
+                <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                    <h1 className="text-2xl font-bold">
+                        {view === "dashboard" ? "Dashboard" : view === "experience" ? "Experience" : "Skills"}
+                    </h1>
+                    {view !== "dashboard" && (
+                        <button
+                            onClick={() => {
+                                if (editing) setEditing(null);
+                                else setAddOpen(!addOpen);
+                            }}
+                            className="flex cursor-pointer items-center gap-2 rounded-md bg-gray-200 p-2 transition active:scale-95"
+                        >
+                            <span>{formOpen ? "Close Form" : view === "experience" ? "Add Experience" : "Add New Skill"}</span>
+                            {view === "experience" ? (
+                                <FcAddDatabase size={30} />
+                            ) : (
+                                <BiCodeBlock size={30} className="text-green-500" />
+                            )}
+                        </button>
+                    )}
+                </div>
 
-    {view === "dashboard" && <Dashboard projects={contents.length} skills={skills.length} />}
+                {view === "dashboard" && <Dashboard projects={contents.length} skills={skills.length} />}
 
                 {/* EXPERIENCE */}
                 {view === "experience" && (

@@ -6,6 +6,28 @@ import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
 
+
+
+function parseUA(ua) {
+    const device = /ipad|tablet|android(?!.*mobile)/i.test(ua)
+        ? "Tablet"
+        : /mobi|iphone|android/i.test(ua)
+        ? "Mobile"
+        : "Desktop";
+    const os = /windows/i.test(ua) ? "Windows"
+        : /iphone|ipad|ipod/i.test(ua) ? "iOS"
+        : /android/i.test(ua) ? "Android"
+        : /mac os/i.test(ua) ? "macOS"
+        : /linux/i.test(ua) ? "Linux" : "Other";
+    const browser = /edg\//i.test(ua) ? "Edge"
+        : /opr\/|opera/i.test(ua) ? "Opera"
+        : /chrome|crios/i.test(ua) ? "Chrome"
+        : /firefox|fxios/i.test(ua) ? "Firefox"
+        : /safari/i.test(ua) ? "Safari" : "Other";
+    return { device, os, browser };
+}
+
+
 export async function POST(req) {
     try {
         const { type, ref } = await req.json();
@@ -36,12 +58,13 @@ export async function POST(req) {
             .update(ip + ua + (process.env.JWT_SECRET || ""))
             .digest("hex");
 
-        await supabaseAdmin.from("site_events").insert({
-            type,
-            ref: ref ? String(ref).slice(0, 120) : null,
-            visitor_hash,
-            country: req.headers.get("x-vercel-ip-country") || null,
-        });
+       await supabaseAdmin.from("site_events").insert({
+    type,
+    ref: ref ? String(ref).slice(0, 120) : null,
+    visitor_hash,
+    country: req.headers.get("x-vercel-ip-country") || null,
+    ...parseUA(ua),
+});
         return NextResponse.json({ ok: true });
     } catch {
         return NextResponse.json({ ok: false }, { status: 500 });
