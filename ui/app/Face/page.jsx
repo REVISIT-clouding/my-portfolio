@@ -1080,7 +1080,7 @@ useEffect(() => {
 
                     <Reveal delay={250}>
                         <div className="mt-5 text-sm items-center">
-                            <div>2+ years in Software development • 21 projects shipped(Most in private repo)</div>
+                            <div>2 years in Software development • 21 projects shipped(Most in private repo)</div>
                         </div>
                     </Reveal>
 
