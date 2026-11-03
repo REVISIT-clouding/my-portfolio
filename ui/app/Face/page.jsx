@@ -1211,13 +1211,7 @@ export default function Face() {
         >
             <SkillIcon name={name} white={!!on} />
             {name}
-            <span
-                className={`grid h-5 min-w-5 place-items-center rounded-full px-1 text-xs font-bold ${
-                    on ? "bg-white/25" : "bg-gray-100 text-gray-600"
-                }`}
-            >
-                {count}
-            </span>
+            
         </button>
     );
 })}
