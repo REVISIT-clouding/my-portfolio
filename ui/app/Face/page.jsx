@@ -1,7 +1,6 @@
 "use client"
 
-import { BiPhone, BiMessageDetail, BiEnvelope, BiRightArrowAlt, BiX, BiMenu, BiDownload, BiMap } from "react-icons/bi";
-import { FaGithub, FaLinkedin, FaXTwitter, FaWhatsapp } from "react-icons/fa6";
+import { BiPhone, BiMessageDetail, BiEnvelope, BiRightArrowAlt, BiX, BiMenu, BiDownload, BiMap, BiLock, BiLike, BiSolidLike } from "react-icons/bi";import { FaGithub, FaLinkedin, FaXTwitter, FaWhatsapp } from "react-icons/fa6";
 import { MdOutlineContactPage } from "react-icons/md";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { useEffect, useRef, useState } from "react";
@@ -871,12 +870,14 @@ function EndorseButton({ name, endorse, onEndorse }) {
         <button
             onClick={() => onEndorse(name)}
             disabled={done}
+            aria-label={done ? `You endorsed ${name}` : `Endorse ${name}`}
             title={done ? "You endorsed this" : `Endorse ${name}`}
-            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition active:scale-95 ${
-                done ? "border-red-500 bg-red-500 text-white" : "bg-white hover:border-red-500"
+            className={`inline-flex items-center gap-1 text-xs font-semibold transition active:scale-95 ${
+                done ? "text-red-500" : "text-gray-400 hover:text-red-500"
             }`}
         >
-            👍 {n > 0 ? n : "Endorse"}
+            {done ? <BiSolidLike className="text-base" /> : <BiLike className="text-base" />}
+            {n > 0 && <span>{n}</span>}
         </button>
     );
 }
@@ -972,10 +973,10 @@ useEffect(() => {
 }, []);
 
     useEffect(() => {
-        fetchAllExp();
-        fetchSkills();
-    }, []);
-
+    fetchAllExp();
+    fetchSkills();
+    fetchEndorse();
+}, []);
     /* ---------- skills <-> projects link ---------- */
     const usesSkill = (project, name) => stackOf(project.stack).some((t) => norm(t) === norm(name));
     const countFor = (name) => contents.filter((p) => usesSkill(p, name)).length;
@@ -1276,7 +1277,7 @@ useEffect(() => {
 
     const on = activeSkill && norm(activeSkill) === norm(name);
     return (
-        <span key={name} className="inline-flex items-center gap-1">
+        <span key={name} className="inline-flex flex-col items-center gap-1">
             <button
                 onClick={() => pickSkill(name)}
                 aria-pressed={!!on}
