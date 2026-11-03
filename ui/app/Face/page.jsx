@@ -36,8 +36,7 @@ export const ABOUT_FULL = [
 // Replace these with real quotes from real people before you publish.
 const TESTIMONIALS = [
     { quote: "I Like Your Vision and Drive.", name: "Dr Iyamu", role: "CEO & member of NEC Nigeria, Enoma Medical Center" },
-    { quote: "WoW! WoW!! WoW!!! That's my Beloved son, Uchechukwu in action. Replace this with a real quote from a client, employer or teammate.I'm Very proud of you dear. You have done so well. May my good God so bless and lift you so high in Jesus Name, amen.", name: "Mr David Uworgiren", role: "Rev Pastor & District Men's Coordinator, Edo East." },
-    { quote: "He makes everything looks easy. He's my enginneer.", name: "Mr Emeka", },
+    { quote: "He can build anything, all i have to do is meet him. He's my enginneer.", name: "Mr Emeka", },
 ];
 
 const NAV = [
@@ -788,9 +787,9 @@ function ContactSection() {
 /* ---------- CV section (last on the page) ---------- */
 function CvSection({ skillNames }) {
     const snapshot = [
-        ["Role", "Full-stack developer"],
-        ["Based in", "Bennin City, Nigeria"],
-        ["Focus", "Multi-tenant and offline-first apps"],
+        ["Role", "Full-stack software developer"],
+        ["Based in", "Benin City, Nigeria"],
+        ["Focus", "Multi-tenant, high performance systems, and offline-first apps"],
         ["Core skills", skillNames.slice(0, 6).join(", ") || "-"],
     ];
 
