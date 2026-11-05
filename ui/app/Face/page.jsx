@@ -1005,7 +1005,14 @@ useEffect(() => {
 
             {/* HERO */}
             <section id="home" className="relative overflow-hidden px-5 pb-12 pt-6">
-                <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-red-500/15 blur-3xl" />
+                <div
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-0
+       bg-[linear-gradient(to_right,rgba(0,0,0,0.15)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.15)_1px,transparent_1px)]
+        bg-[size:40px_40px]
+        [-webkit-mask-image:linear-gradient(to_bottom,black_60%,transparent)]
+        [mask-image:linear-gradient(to_bottom,black_60%,transparent)]"
+/>
 
                 <Wrap>
                     <Reveal>
